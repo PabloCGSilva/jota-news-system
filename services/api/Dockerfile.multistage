@@ -1,5 +1,5 @@
 # Multi-stage Dockerfile for production optimization
-FROM python:3.11-slim as base
+FROM python:3.13-slim as base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -61,7 +61,7 @@ RUN bandit -r . -f json -o bandit-report.json || true
 RUN safety check --json --output safety-report.json || true
 
 # Production stage
-FROM python:3.11-slim as production
+FROM python:3.13-slim as production
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
