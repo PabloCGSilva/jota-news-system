@@ -4,6 +4,8 @@
 
 This document describes the comprehensive CI/CD pipeline setup for the JOTA News System using GitHub Actions, providing automated testing, security scanning, and deployment capabilities.
 
+**Note**: This CI/CD setup is designed for production deployments. The JOTA News System runs completely out-of-the-box for local development and demonstrations without requiring any CI/CD configuration.
+
 ## Pipeline Components
 
 ### 1. GitHub Actions Workflows
@@ -181,25 +183,25 @@ graph LR
 
 ## Pipeline Features
 
-### ✅ Automated Testing
+### Automated Testing
 - **Unit Tests**: Django test suite with 100% coverage
 - **Integration Tests**: Full stack testing with real services
 - **Performance Tests**: Load testing with k6
 - **Security Tests**: Vulnerability scanning
 
-### ✅ Code Quality
+### Code Quality
 - **Formatting**: Automatic code formatting with Black
 - **Linting**: Code quality checks with flake8
 - **Security**: Static analysis with Bandit
 - **Dependencies**: Vulnerability scanning with Safety
 
-### ✅ Deployment Automation
+### Deployment Automation
 - **Multi-environment**: Staging and production pipelines
 - **Rolling Deployment**: Zero-downtime deployments
 - **Health Checks**: Automated verification
 - **Rollback**: Automatic rollback on failure
 
-### ✅ Monitoring & Notifications
+### Monitoring & Notifications
 - **Slack Integration**: Real-time deployment notifications
 - **Metrics**: Performance and security metrics
 - **Alerts**: Automated failure alerts

@@ -200,8 +200,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# Elasticsearch Configuration
-ELASTICSEARCH_URL = config('ELASTICSEARCH_URL', default='http://localhost:9200')
 
 # WhatsApp configuration removed - external META Business API dependency not needed
 
@@ -266,6 +264,10 @@ LOGGING = {
 
 # Create logs directory
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
+
+# Email Configuration - Console backend for out-of-the-box demo
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@jota-news-demo.local')
 
 # News Classification Configuration
 CLASSIFICATION_CATEGORIES = {

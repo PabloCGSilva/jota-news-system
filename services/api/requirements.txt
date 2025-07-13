@@ -29,8 +29,6 @@ redis==4.6.0
 pika==1.3.2
 
 # Search
-elasticsearch==8.10.1
-elasticsearch-dsl==8.11.0
 
 # NLP and Classification
 nltk==3.8.1

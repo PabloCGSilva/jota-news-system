@@ -37,7 +37,6 @@ def readiness_check(request):
     checks = {
         'database': check_database(),
         'redis': check_redis(),
-        'elasticsearch': check_elasticsearch(),
     }
     
     all_healthy = all(checks.values())
@@ -85,15 +84,6 @@ def check_redis():
         return False
 
 
-def check_elasticsearch():
-    """Check Elasticsearch connectivity."""
-    try:
-        import requests
-        response = requests.get(f"{settings.ELASTICSEARCH_URL}/_cluster/health", timeout=5)
-        return response.status_code == 200
-    except Exception as e:
-        logger.error(f"Elasticsearch health check failed: {e}")
-        return False
 
 
 def get_uptime():

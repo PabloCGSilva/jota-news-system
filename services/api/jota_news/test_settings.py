@@ -70,5 +70,4 @@ DEBUG = True
 ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1']
 
 # Disable external requests
-ELASTICSEARCH_URL = 'http://mock-elasticsearch.local:9200'
 REDIS_URL = 'redis://mock-redis.local:6379/0'

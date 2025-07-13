@@ -148,8 +148,7 @@ def api_overview(request):
                 'version': '1.0.0',
                 'services': {
                     'database': 'healthy',
-                    'redis': 'healthy',
-                    'elasticsearch': 'healthy'
+                    'redis': 'healthy'
                 }
             }
         },
@@ -161,8 +160,7 @@ def api_overview(request):
                 'version': '1.0.0',
                 'services': {
                     'database': 'healthy',
-                    'redis': 'unhealthy',
-                    'elasticsearch': 'degraded'
+                    'redis': 'unhealthy'
                 }
             }
         }
@@ -210,22 +208,6 @@ def health_check(request):
         health_status['services']['redis'] = f'unhealthy: {str(e)}'
         overall_healthy = False
     
-    # Check Elasticsearch (if configured)
-    try:
-        from elasticsearch import Elasticsearch
-        es_url = getattr(settings, 'ELASTICSEARCH_URL', None)
-        if es_url:
-            es = Elasticsearch([es_url])
-            if es.ping():
-                health_status['services']['elasticsearch'] = 'healthy'
-            else:
-                health_status['services']['elasticsearch'] = 'unhealthy: ping failed'
-                overall_healthy = False
-        else:
-            health_status['services']['elasticsearch'] = 'not_configured'
-    except Exception as e:
-        health_status['services']['elasticsearch'] = f'unhealthy: {str(e)}'
-        overall_healthy = False
     
     # Check Celery workers (basic check)
     try:

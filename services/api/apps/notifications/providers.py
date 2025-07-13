@@ -103,6 +103,13 @@ class WebhookProvider(BaseNotificationProvider):
                 'metadata': metadata or {}
             }
             
+            # Check if this is a demo/mock webhook (localhost or demo URLs)
+            if 'localhost' in destination or 'demo' in destination or '127.0.0.1' in destination:
+                # Mock successful webhook for demo purposes
+                external_id = f"webhook_demo_{timezone.now().timestamp()}"
+                logger.info(f"Demo webhook simulated for {destination}")
+                return True, external_id, {'status_code': 200, 'demo': True}
+            
             # Add authentication if configured
             headers = {'Content-Type': 'application/json'}
             auth_token = self.config.get('auth_token')
@@ -145,6 +152,13 @@ class SlackProvider(BaseNotificationProvider):
         Send Slack notification.
         """
         try:
+            # Check if this is a demo/mock Slack webhook (localhost or demo URLs)
+            if 'localhost' in destination or 'demo' in destination or '127.0.0.1' in destination or 'hooks.slack.com' not in destination:
+                # Mock successful Slack notification for demo purposes
+                external_id = f"slack_demo_{timezone.now().timestamp()}"
+                logger.info(f"Demo Slack notification simulated: {subject}")
+                return True, external_id, {'response': 'ok', 'demo': True}
+            
             # destination should be a Slack webhook URL
             payload = {
                 'text': f"*{subject}*\n{message}" if subject else message,

@@ -1,0 +1,99 @@
+﻿Desafio Técnico para Desenvolvedor Python - Jota
+Contexto:
+O Jota recebe um grande volume de notícias de diversas fontes, incluindo agências internacionais, redes sociais e envios de usuários. Essas notícias precisam ser processadas, classificadas por Categoria e disponibilizadas para a equipe editorial através de uma API REST. Além disso, o JOTA deseja integrar o envio de notificações via WhatsApp para notícias urgentes.
+Categoria
+É o que chamamos de vertical, ou seja, um grupo principal que agrupa notícias com temas semelhantes. As categorias são amplas e refletem os principais assuntos cobertos. Exemplos:
+* Poder
+* Tributos
+* Saúde
+* Trabalhista
+Essas categorias podem ser expandidas no futuro para incluir novas áreas de interesse, conforme a necessidade.
+________________
+
+
+Subcategoria
+É uma subdivisão de uma categoria, que detalha ainda mais o tema principal. As subcategorias estão relacionadas à forma como a notícia é entregue ou ao foco específico dentro de uma categoria. Exemplos:
+* Aposta da Semana (dentro de Tributos)
+* Matinal (um formato de entrega de notícias)
+Assim como as categorias, as subcategorias podem ser adaptadas ou expandidas no futuro para atender a novas demandas.
+________________
+
+
+Notícia
+É o conteúdo entregue ao leitor. Uma notícia é composta por um título, corpo do texto, fonte, data de publicação e outros metadados. Ela está sempre vinculada a uma categoria e, opcionalmente, a uma subcategoria.
+________________
+
+
+Tags/Palavras-chave
+São termos ou frases curtas usados para classificar e agrupar conteúdos com base no tema ou no contexto da notícia. As tags ajudam na busca, organização e recomendação de notícias relacionadas. Exemplos:
+* Reforma Tributária
+* Imposto de Renda
+* Saúde Pública
+________________
+
+
+Exemplo Prático:
+Vamos usar o link fornecido como exemplo:
+* Categoria: Tributos
+* Subcategoria: Aposta da Semana
+* Notícia: "Projeto de isenção do IR deve ser apresentado ao Congresso nesta terça"
+* Tags/Palavras-chave: Imposto de Renda, Congresso, Isenção Fiscal
+Outro exemplo: https://www.jota.info/tributos/stf-tem-maioria-para-manter-teto-para-deducao-de-gastos-com-educacao-no-imposto-de-renda
+
+
+Com base nesse cenário, construa uma solução que:
+1. Receba Webhooks
+
+   * Implemente um endpoint que receba webhooks contendo as notícias em formato JSON.
+   2. Armazene as Notícias em Fila
+
+      * Utilize um serviço de fila de mensagens para garantir que todas as notícias sejam processadas, mesmo em caso de picos de recebimento.
+      3. Classifique as Notícias
+
+         * Projete e implemente um sistema de classificação de notícias utilizando Python e suas bibliotecas (Não use IA, queremos validar a Lógica)
+         4. Armazene as Notícias
+
+            * Utilize um banco de dados para armazenar as notícias classificadas, incluindo título, conteúdo, fonte, data, categoria e flag de urgência.
+            5. Crie uma API REST
+
+               * Utilize o framework Django REST para criar uma API que permita à equipe editorial:
+               * Acessar as notícias classificadas, filtrando por categoria, data e outros critérios.
+               * Marcar notícias como urgentes.
+               6. Implemente em Lambda
+
+                  * Utilize funções Lambda para:
+                  * Processar as notícias da fila de mensagens.
+                  * Classificar as notícias.
+                  * Armazená-las no banco de dados.
+                  7. Agrupamento de Notícias por Temática
+
+                     * A API deve categorizar automaticamente as notícias de acordo com o assunto da notícia em tags.
+                     * A classificação deve ser baseada na análise de palavras-chave contidas no título e no corpo do texto.
+                     * A API deve permitir filtrar e listar notícias por temática, facilitando a navegação e organização do conteúdo.
+
+
+                     8. Escalabilidade
+
+                        * A solução deve ser escalável para lidar com o crescente volume de notícias.
+                        9. Segurança
+
+                           * Implemente as melhores práticas de segurança ou explique o que usaria.
+                           10. Observabilidade
+
+                              * Implemente mecanismos de observabilidade para monitorar o desempenho da solução e identificar gargalos.
+Requisitos:
+                              * Utilizar Python 3.x e o framework Django 3.x ou superior.
+                              * Implementar uma solução escalável, segura e observável.
+                              * Documentar o código e a arquitetura da solução, incluindo diagramas e explicações claras.
+                              * Versionar o código utilizando Git.
+                              * Escrever testes unitários e de integração para garantir a qualidade do código.
+                              * Utilizar Docker para containerizar os microsserviços.
+Entrega:
+                              * O candidato deve entregar o código-fonte da solução em um repositório Git (ex: GitHub, GitLab, Bitbucket).
+                              * O repositório deve incluir a documentação, instruções de deployment e scripts para automatizar o processo.
+                              * O candidato deve apresentar a solução Rodando e responder a perguntas sobre a arquitetura, o código e as decisões tomadas durante o desenvolvimento na próxima fase.
+Observações:
+                              * Este desafio foi projetado para avaliar as habilidades do candidato em Python, Django, Cloud e arquitetura de microsserviços.
+                              * O candidato é livre para utilizar bibliotecas e ferramentas de sua preferência, desde que justifique suas escolhas.
+                              * A criatividade, a capacidade de resolver problemas e a atenção aos detalhes serão altamente valorizadas.
+                              * Qualquer dúvida sobre o requisito pode nos enviar.

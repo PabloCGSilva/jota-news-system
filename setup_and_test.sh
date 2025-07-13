@@ -171,7 +171,6 @@ CELERY_BROKER_URL=redis://redis:6379/0
 CELERY_RESULT_BACKEND=redis://redis:6379/0
 
 # External Services (Optional)
-ELASTICSEARCH_URL=http://elasticsearch:9200
 RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
 
 # Email Settings (Console backend for demo)
@@ -210,41 +209,9 @@ start_services() {
     print_status "INFO" "Running database migrations..."
     docker-compose exec -T api python manage.py migrate
     
-    # Create superuser if it doesn't exist
-    print_status "INFO" "Creating superuser..."
-    docker-compose exec -T api python manage.py shell -c "
-from django.contrib.auth import get_user_model
-User = get_user_model()
-if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@jota.news', 'admin123')
-    print('Superuser created: admin/admin123')
-else:
-    print('Superuser already exists')
-" 2>/dev/null || print_status "WARNING" "Could not create superuser automatically"
-    
-    # Create sample data
-    print_status "INFO" "Creating sample data..."
-    docker-compose exec -T api python manage.py shell -c "
-from apps.news.models import Category, News
-from apps.authentication.models import User
-
-# Create categories
-categories = ['Technology', 'Politics', 'Sports', 'Business', 'Health']
-for cat_name in categories:
-    Category.objects.get_or_create(name=cat_name, defaults={'description': f'{cat_name} news'})
-
-# Create sample news if none exist
-if News.objects.count() < 5:
-    for i in range(5):
-        News.objects.create(
-            title=f'Sample News Article {i+1}',
-            content=f'This is sample content for article {i+1}. Lorem ipsum dolor sit amet.',
-            source='Demo System',
-            author='System',
-            category=Category.objects.first()
-        )
-print('Sample data created')
-" 2>/dev/null || print_status "WARNING" "Could not create sample data"
+    # Setup demo data for immediate use
+    print_status "INFO" "Setting up demo data for out-of-the-box functionality..."
+    docker-compose exec -T api python setup_demo_data.py 2>/dev/null || print_status "WARNING" "Could not create demo data automatically"
 }
 
 # Function to run comprehensive tests
