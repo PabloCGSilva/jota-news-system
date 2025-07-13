@@ -13,6 +13,7 @@
 ## Quick Start - Production Deployment
 
 ### Prerequisites Validation
+
 ```bash
 # System Requirements Check
 docker --version          # >= 20.10
@@ -23,11 +24,13 @@ df -h                      # Verify 2GB+ disk space free
 ```
 
 **Minimum Requirements:**
+
 - **Memory**: 4GB+ RAM (optimized for constrained environments)
 - **Disk**: 2GB+ free space for Docker images and data
 - **Ports**: 8000, 3000, 5432, 6379 (automatically checked during setup)
 
 ### One-Command Setup
+
 ```bash
 # Clone and deploy in under 3 minutes
 git clone https://github.com/PabloCGSilva/jota-news-system.git
@@ -37,6 +40,7 @@ chmod +x setup_and_test.sh
 ```
 
 **Advanced Setup Options:**
+
 ```bash
 # Quick setup without tests
 ./setup_and_test.sh --skip-tests
@@ -49,6 +53,7 @@ chmod +x setup_and_test.sh
 ```
 
 ### Automated Health Verification
+
 The setup script automatically validates system health with comprehensive checks:
 
 ```bash
@@ -71,6 +76,7 @@ python3 test_runner.py --health
 ```
 
 **What gets validated automatically:**
+
 - System memory and disk space requirements
 - Docker daemon availability and version
 - Port availability and conflict detection  
@@ -81,12 +87,14 @@ python3 test_runner.py --health
 ### Access Points After Setup
 
 **Main Dashboards:**
-- **API Documentation**: http://localhost:8000/api/docs/
-- **Grafana Monitoring**: http://localhost:3000 (admin/admin)
-- **Demo Dashboard**: http://localhost:8000/demo/
-- **Health Status**: http://localhost:8000/health/
+
+- **API Documentation**: <http://localhost:8000/api/docs/>
+- **Grafana Monitoring**: <http://localhost:3000> (admin/admin)
+- **Demo Dashboard**: <http://localhost:8000/demo/>
+- **Health Status**: <http://localhost:8000/health/>
 
 **Testing and Validation:**
+
 ```bash
 # Interactive demo mode with menu options
 python3 test_runner.py --demo
@@ -103,6 +111,7 @@ python3 test_runner.py --health
 **GitHub Actions - Automated DevOps Pipeline**
 
 **Step 1: Push to GitHub**
+
 ```bash
 # Create GitHub repository at github.com
 # Then push your code:
@@ -111,11 +120,13 @@ git push -u origin main
 ```
 
 **Step 2: Watch Automation**
+
 - Go to your GitHub repository
 - Click the **"Actions"** tab
 - Watch your automated pipeline run!
 
 **Pipeline Features:**
+
 - Automated testing (runs all 143 tests on every push)
 - Code quality automation (Black, flake8, isort)
 - Security scanning (Bandit, Safety, Trivy)
@@ -124,6 +135,7 @@ git push -u origin main
 
 **Authentication Setup:**
 GitHub requires Personal Access Token (not password):
+
 1. GitHub.com → Settings → Developer settings → Personal access tokens
 2. Generate new token with `repo` permissions
 3. Use token as password when pushing
@@ -137,6 +149,7 @@ For detailed CI/CD setup: **[GITHUB_ACTIONS_SETUP.md](GITHUB_ACTIONS_SETUP.md)**
 The JOTA News System is a **production-ready, enterprise-grade** news processing platform demonstrating advanced software engineering principles. Built with a **zero-waste architecture** that eliminates external API dependencies for simplified deployment.
 
 ### Key Achievement Metrics
+
 - **100% Test Success Rate** with comprehensive validation
 - **30-39ms API Response Times** under load
 - **5 Pre-configured Monitoring Dashboards** with automated setup
@@ -179,6 +192,7 @@ The JOTA News System is a **production-ready, enterprise-grade** news processing
 The system includes a sophisticated Natural Language Processing engine optimized for Portuguese news classification:
 
 **Features:**
+
 - **Portuguese Language Support**: 226 Portuguese stopwords, specialized tokenization
 - **Text Preprocessing**: Removes noise, normalizes content for better classification
 - **Stemming**: Reduces word variations (e.g., "tecnologia" variants → "tecnolog")
@@ -187,6 +201,7 @@ The system includes a sophisticated Natural Language Processing engine optimized
 - **Fallback Support**: Graceful degradation when NLTK unavailable
 
 **Management Commands:**
+
 ```bash
 # Setup NLTK data manually
 python manage.py setup_nltk
@@ -265,18 +280,21 @@ graph TB
 The system has been optimized for **reliable tech lead demonstrations** with the following enhancements:
 
 #### **Database Reliability**
+
 - **Fixed foreign key constraints** - Resolved demo dashboard webhook log creation issues
 - **Proper test isolation** - SQLite in-memory database for clean test runs
 - **Migration safety** - Handles existing data during upgrades
 - **100% test success** - All tests now pass reliably
 
-#### **Resource Optimization** 
+#### **Resource Optimization**
+
 - **50% memory reduction** - Optimized from 8GB to 4GB RAM requirement
 - **Removed external dependencies** - No WhatsApp Business API required
 - **Efficient service selection** - 14 core services for essential functionality
 - **Smart resource allocation** - Only essential components active
 
 #### **Robust Setup Experience**
+
 - **100% success rate** - Comprehensive pre-flight checks and validation
 - **Memory & disk validation** - Ensures system requirements before deployment
 - **Port conflict detection** - Gracefully handles common port conflicts
@@ -284,12 +302,14 @@ The system has been optimized for **reliable tech lead demonstrations** with the
 - **Clear error messages** - Professional troubleshooting guidance
 
 #### **Simplified Dependencies**
+
 - **No external integrations** - Removed complex third-party API dependencies
 - **Console email backend** - No SMTP configuration required
 - **Demo mode ready** - Self-contained system for presentations
 - **Zero configuration** - Works immediately after clone and setup
 
 ### Reliability Metrics
+
 - **Setup Success Rate**: 100% (validated across environments)
 - **Memory Requirements**: 4GB+ (optimized, was 8GB+)
 - **Startup Time**: <3 minutes (complete system deployment)
@@ -301,6 +321,7 @@ The system has been optimized for **reliable tech lead demonstrations** with the
 ## Quick Start - Production Deployment
 
 ### Prerequisites Validation
+
 ```bash
 # System Requirements Check
 docker --version          # >= 20.10
@@ -311,11 +332,13 @@ df -h                      # Verify 2GB+ disk space free
 ```
 
 **Minimum Requirements:**
+
 - **Memory**: 4GB+ RAM (optimized for constrained environments)
 - **Disk**: 2GB+ free space for Docker images and data
 - **Ports**: 8000, 3000, 5432, 6379 (automatically checked during setup)
 
 ### One-Command Setup
+
 ```bash
 # Clone and deploy in under 3 minutes
 git clone <repository-url>
@@ -325,6 +348,7 @@ chmod +x setup_and_test.sh
 ```
 
 **Advanced Setup Options:**
+
 ```bash
 # Quick setup without tests
 ./setup_and_test.sh --skip-tests
@@ -337,6 +361,7 @@ chmod +x setup_and_test.sh
 ```
 
 ### Automated Health Verification
+
 The setup script automatically validates system health with comprehensive checks:
 
 ```bash
@@ -359,6 +384,7 @@ python3 test_runner.py --health
 ```
 
 **What gets validated automatically:**
+
 - System memory and disk space requirements
 - Docker daemon availability and version
 - Port availability and conflict detection  
@@ -375,6 +401,7 @@ python3 test_runner.py --health
 Each component is monitored with **zero tolerance for failure**:
 
 #### Core Services Health Check
+
 ```bash
 # API Layer
 curl http://localhost:8000/health/          # Django API
@@ -391,6 +418,7 @@ curl http://localhost:8000/security/metrics/ # Security Events
 ```
 
 #### Database & Cache Validation
+
 ```bash
 # Data Layer Connectivity
 docker-compose exec api python manage.py dbshell
@@ -411,6 +439,7 @@ docker-compose exec redis redis-cli ping
 ## Comprehensive Testing Strategy
 
 ### Automated Test Execution
+
 ```bash
 # Complete test suite with reporting
 python3 test_runner.py --all
@@ -422,6 +451,7 @@ python3 test_runner.py --monitoring   # Service health
 ```
 
 ### Test Coverage Analysis
+
 - **143 Total Tests** across all components
 - **100% Success Rate** (all issues resolved)
 - **Unit Tests**: Model validation, business logic
@@ -430,6 +460,7 @@ python3 test_runner.py --monitoring   # Service health
 - **Security Tests**: Authentication, authorization, input validation
 
 ### Interactive Demo Mode
+
 ```bash
 # Live system demonstration
 python3 test_runner.py --demo
@@ -450,6 +481,7 @@ python3 test_runner.py --demo
 ## Security & Authentication Framework
 
 ### Multi-Layer Security
+
 - **JWT Authentication**: Stateless, scalable authentication
 - **API Key Management**: Service-to-service authentication
 - **Rate Limiting**: 100 req/hour (anonymous), 1000 req/hour (authenticated)
@@ -459,6 +491,7 @@ python3 test_runner.py --demo
 - **XSS Protection**: Django built-in security middleware
 
 ### Webhook Security
+
 ```python
 # Signature verification example
 import hmac
@@ -480,34 +513,39 @@ def verify_webhook_signature(payload, signature, secret):
 ### Real-Time Dashboards
 
 #### 1. **Complete System Dashboard**
+
 - System performance and health metrics
 - API response times and throughput
 - Database connection pool usage
-- **Access**: http://localhost:3000/d/jota-news-complete
+- **Access**: <http://localhost:3000/d/jota-news-complete>
 
 #### 2. **Celery Task Monitoring**
+
 - Task execution rates and success rates
 - Queue depth and processing times
 - Worker health and resource usage
-- **Access**: http://localhost:3000/d/celery-dashboard
+- **Access**: <http://localhost:3000/d/celery-dashboard>
 
 #### 3. **Business Metrics Dashboard**
+
 - News article processing volume
 - Classification accuracy metrics
 - User engagement statistics
-- **Access**: http://localhost:3000/d/business-dashboard
+- **Access**: <http://localhost:3000/d/business-dashboard>
 
 #### 4. **Security Monitoring**
+
 - Failed authentication attempts
 - Suspicious IP activity
 - Rate limiting violations
-- **Access**: http://localhost:3000/d/security-dashboard
+- **Access**: <http://localhost:3000/d/security-dashboard>
 
 #### 5. **Redis Performance**
+
 - Memory usage and key distribution
 - Command execution statistics
 - Client connection monitoring
-- **Access**: http://localhost:3000/d/redis-dashboard
+- **Access**: <http://localhost:3000/d/redis-dashboard>
 
 ### Key Performance Indicators (KPIs)
 
@@ -529,6 +567,7 @@ curl http://localhost:8000/security/metrics/ | grep -E "(failed_logins|blocked_i
 ### Machine Learning Pipeline
 
 #### Classification Algorithm
+
 ```python
 # Hybrid classification approach with NLTK preprocessing
 def classify_news(title, content, method='hybrid'):
@@ -560,6 +599,7 @@ def preprocess_text(text):
 ```
 
 #### Training Data & Accuracy
+
 - **Portuguese Language**: NLTK-optimized for Brazilian news content
 - **13 Categories**: Economics, Politics, Technology, Sports, etc.
 - **85%+ Accuracy**: Continuously improved through feedback
@@ -573,6 +613,7 @@ def preprocess_text(text):
 ### RESTful API Endpoints
 
 #### Authentication
+
 ```bash
 # JWT Token Authentication
 curl -X POST http://localhost:8000/api/v1/auth/login/ \
@@ -585,6 +626,7 @@ curl -H "Authorization: Api-Key YOUR_API_KEY" \
 ```
 
 #### News Management
+
 ```bash
 # List articles with filtering
 GET /api/v1/news/articles/?category=technology&is_urgent=true
@@ -603,6 +645,7 @@ GET /api/v1/news/articles/{uuid}/
 ```
 
 #### Webhook Integration
+
 ```bash
 # Register webhook source
 POST /api/v1/webhooks/sources/
@@ -624,9 +667,10 @@ POST /api/v1/webhooks/receive/{source_name}/
 ```
 
 ### API Documentation
-- **Swagger UI**: http://localhost:8000/api/docs/
-- **ReDoc**: http://localhost:8000/api/redoc/
-- **OpenAPI Schema**: http://localhost:8000/api/schema/
+
+- **Swagger UI**: <http://localhost:8000/api/docs/>
+- **ReDoc**: <http://localhost:8000/api/redoc/>
+- **OpenAPI Schema**: <http://localhost:8000/api/schema/>
 
 ---
 
@@ -635,6 +679,7 @@ POST /api/v1/webhooks/receive/{source_name}/
 The project includes comprehensive demo and testing utilities:
 
 ### **test_runner.py** - Main Test & Demo Interface
+
 The primary automation tool for testing and demonstrations:
 
 ```bash
@@ -655,6 +700,7 @@ python3 test_runner.py --health
 ```
 
 **Features:**
+
 - Automated test execution with detailed reporting
 - Service health validation across all components  
 - Performance testing with response time analysis
@@ -663,6 +709,7 @@ python3 test_runner.py --health
 - Comprehensive JSON reports with metrics
 
 ### **setup_and_test.sh** - Enterprise Setup Automation
+
 Complete one-command setup and deployment with enterprise-grade automation:
 
 ```bash
@@ -680,6 +727,7 @@ Complete one-command setup and deployment with enterprise-grade automation:
 ```
 
 **Enterprise Features:**
+
 - **Comprehensive Prerequisites Checking** - Docker, ports, system requirements
 - **Intelligent Environment Setup** - Auto-generates .env with secure defaults
 - **Docker Orchestration** - Pulls images, builds services, manages containers
@@ -696,6 +744,7 @@ Complete one-command setup and deployment with enterprise-grade automation:
 ### Common Issues & Solutions
 
 #### Service Connectivity Issues
+
 ```bash
 # Check all service status
 docker-compose ps
@@ -710,6 +759,7 @@ docker-compose restart api
 ```
 
 #### Database Issues
+
 ```bash
 # Check database connectivity
 docker-compose exec api python manage.py dbshell
@@ -722,6 +772,7 @@ docker-compose exec postgres psql -U postgres -d jota_news -c "SELECT * FROM pg_
 ```
 
 #### Performance Issues
+
 ```bash
 # Monitor resource usage
 docker stats
@@ -789,6 +840,7 @@ The JOTA News System includes a **production-ready CI/CD pipeline** using GitHub
 #### **Quick Setup (First Time GitHub Actions Users)**
 
 **Step 1: Push to GitHub**
+
 ```bash
 # Create GitHub repository at github.com
 # Then push your code:
@@ -797,6 +849,7 @@ git push -u origin main
 ```
 
 **Step 2: Watch Automation Execute**
+
 - Go to your GitHub repository
 - Click the **"Actions"** tab
 - Watch your automated pipeline run!
@@ -804,30 +857,35 @@ git push -u origin main
 #### **Pipeline Features**
 
 **Automated Testing**
+
 - Runs all 143 tests on every push
 - Integration tests with real PostgreSQL/Redis
 - Performance testing with k6 load testing
 - 100% test success rate validation
 
 **Code Quality Automation**
+
 - Code formatting (Black)
 - Linting (flake8)
 - Import sorting (isort)
 - Security scanning (Bandit, Safety)
 
 **Security First**
+
 - Container vulnerability scanning (Trivy)
 - Dependency security checks
 - Secrets detection
 - SAST integration
 
 **Smart Deployment**
+
 - **develop branch** → Auto-deploy to staging
 - **main branch** → Auto-deploy to production (with approval)
 - Zero-downtime rolling deployments
 - Automatic rollback on failure
 
 **Monitoring & Notifications**
+
 - Slack notifications for deployment status
 - Performance benchmarking
 - Health checks after deployment
@@ -859,12 +917,14 @@ quality-checks → test → build → integration-test → security → deploy
 ```
 
 **Security Scanning:**
+
 - Container images scanned for vulnerabilities
 - Dependencies checked for known security issues
 - Code analyzed for security patterns
 - Results automatically reported in GitHub
 
 **Performance Monitoring:**
+
 - Load testing on every deployment
 - Response time benchmarking
 - Resource usage monitoring
@@ -873,12 +933,14 @@ quality-checks → test → build → integration-test → security → deploy
 #### **Monitoring Your Pipeline**
 
 **GitHub Actions Dashboard:**
+
 - Real-time build status
 - Detailed logs for each step
 - Artifact downloads (coverage reports, security scans)
 - Build history and trends
 
 **Notifications:**
+
 - Email notifications for failed builds
 - Slack integration for team updates
 - PR status checks
@@ -887,24 +949,28 @@ quality-checks → test → build → integration-test → security → deploy
 #### **Enterprise Benefits**
 
 **Enterprise-Grade Automation**
+
 - No manual deployments
 - Consistent quality gates
 - Audit trail for all changes
 - Compliance reporting
 
 **Developer Productivity**
+
 - Instant feedback on code changes
 - Automated code formatting
 - Pre-commit hooks integration
 - Simplified deployment process
 
 **Security & Compliance**
+
 - Every change is tested and scanned
 - Security vulnerabilities caught early
 - Dependency management automation
 - Access control and approvals
 
 **Quality Assurance**
+
 - 100% test success requirement
 - Code coverage tracking
 - Performance regression prevention
@@ -915,6 +981,7 @@ quality-checks → test → build → integration-test → security → deploy
 For detailed setup instructions, see: **[GITHUB_ACTIONS_SETUP.md](GITHUB_ACTIONS_SETUP.md)**
 
 The guide includes:
+
 - Step-by-step GitHub setup
 - First-time user walkthrough
 - Troubleshooting common issues
@@ -929,6 +996,7 @@ The guide includes:
 The JOTA News System represents **enterprise-grade software engineering** with **battle-tested reliability**:
 
 ### **Proven Production Excellence**
+
 - **Zero external dependencies** eliminating third-party API complexity
 - **100% test success rate** with comprehensive validation and error handling
 - **Database reliability** with resolved constraint violations and proper test isolation
@@ -937,6 +1005,7 @@ The JOTA News System represents **enterprise-grade software engineering** with *
 - **Comprehensive testing** (143 tests, 100% pass rate) guaranteeing quality
 
 ### **Tech Lead Ready Features**
+
 - **One-command deployment** with intelligent prerequisites checking
 - **Robust error recovery** and troubleshooting guidance
 - **Constrained environment support** optimized for 4GB+ systems
@@ -944,6 +1013,7 @@ The JOTA News System represents **enterprise-grade software engineering** with *
 - **Complete automation** from clone to running system in under 3 minutes
 
 ### **AI & NLP Excellence**
+
 - **NLTK Portuguese processing** with 226 stopwords and specialized tokenization
 - **Automated setup** with Docker container integration
 - **Advanced text preprocessing** including stemming and normalization
@@ -951,6 +1021,7 @@ The JOTA News System represents **enterprise-grade software engineering** with *
 - **Graceful fallback** support for environments without NLTK
 
 ### **Enterprise Standards Met**
+
 - **Security-first approach** with JWT authentication and rate limiting
 - **Performance optimization** delivering <50ms API response times
 - **Scalable design** supporting horizontal growth
@@ -964,18 +1035,21 @@ This system is **production-ready** and **tech lead approved** - demonstrating a
 ## Support & Contact
 
 ### Technical Support
+
 - **Health Monitoring**: `python3 test_runner.py --health`
 - **Performance Analysis**: `python3 test_runner.py --performance`  
 - **Interactive Demo**: `python3 test_runner.py --demo`
 - **Full Test Suite**: `python3 test_runner.py --all`
 
 ### System Monitoring
-- **Main Dashboard**: http://localhost:3000
-- **API Documentation**: http://localhost:8000/api/docs/
-- **System Metrics**: http://localhost:8000/metrics
-- **Health Status**: http://localhost:8000/health/
+
+- **Main Dashboard**: <http://localhost:3000>
+- **API Documentation**: <http://localhost:8000/api/docs/>
+- **System Metrics**: <http://localhost:8000/metrics>
+- **Health Status**: <http://localhost:8000/health/>
 
 ### Quick Diagnostics
+
 ```bash
 # One-command system status
 curl -s http://localhost:8000/health/ | jq .
