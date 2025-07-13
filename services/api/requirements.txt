@@ -9,7 +9,7 @@ django-filter==23.3
 # Database
 psycopg2-binary==2.9.9
 django-redis==5.4.0
-dj-database-url==2.1.0
+dj-database-url==3.0.1
 
 # API Documentation
 drf-spectacular==0.26.5
