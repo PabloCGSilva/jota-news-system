@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Enhanced Demo Data Generator for JOTA News System
-Creates realistic Brazilian news data with proper classification and user behavior patterns.
+Enhanced Demo Data Generator for JOTA News System (Fixed Version)
+Creates realistic Brazilian news data compatible with current system models.
 """
 import os
 import sys
 import django
 import random
-import requests
+import uuid
 from datetime import datetime, timedelta
 from faker import Faker
 
@@ -31,45 +31,69 @@ NEWS_TEMPLATES = {
     'politica': [
         {
             'title': 'Congresso Nacional aprova nova lei de transparência pública',
-            'content': 'O Congresso Nacional aprovou hoje, por ampla maioria, a nova lei de transparência pública que estabelece critérios mais rigorosos para divulgação de informações governamentais. A proposta, que tramitou por dois anos no Legislativo, recebeu apoio de parlamentares de diferentes partidos.',
+            'content': 'O Congresso Nacional aprovou hoje, por ampla maioria, a nova lei de transparência pública que estabelece critérios mais rigorosos para divulgação de informações governamentais. A proposta, que tramitou por dois anos no Legislativo, recebeu apoio de parlamentares de diferentes partidos. A nova legislação prevê prazos menores para resposta a pedidos de informação e amplia o escopo de dados que devem ser disponibilizados proativamente pelos órgãos públicos.',
             'summary': 'Nova lei de transparência é aprovada com amplo apoio parlamentar',
             'tags': ['transparencia', 'congresso', 'lei', 'governanca']
         },
         {
             'title': 'Supremo Tribunal Federal julga constitucionalidade de marco fiscal',
-            'content': 'O Supremo Tribunal Federal iniciou hoje o julgamento sobre a constitucionalidade do novo marco fiscal brasileiro. Os ministros devem analisar questionamentos sobre limites de gastos públicos e sua compatibilidade com direitos sociais constitucionais.',
+            'content': 'O Supremo Tribunal Federal iniciou hoje o julgamento sobre a constitucionalidade do novo marco fiscal brasileiro. Os ministros devem analisar questionamentos sobre limites de gastos públicos e sua compatibilidade com direitos sociais constitucionais. A sessão, presidida pelo ministro relator, promete ser uma das mais importantes do ano para a economia nacional.',
             'summary': 'STF analisa constitucionalidade do marco fiscal em sessão histórica',
             'tags': ['stf', 'fiscal', 'constituicao', 'orcamento']
+        },
+        {
+            'title': 'Câmara dos Deputados debate reforma do sistema eleitoral',
+            'content': 'A Câmara dos Deputados iniciou hoje a discussão sobre a reforma do sistema eleitoral brasileiro. A proposta inclui mudanças no financiamento de campanhas, regras para debates televisivos e critérios para formação de coligações. Os deputados destacaram a importância de modernizar o processo democrático.',
+            'summary': 'Câmara inicia debates sobre modernização do sistema eleitoral',
+            'tags': ['eleicoes', 'reforma', 'democracia', 'congresso']
         }
     ],
     'economia': [
         {
             'title': 'Banco Central mantém taxa Selic em 10,75% ao ano',
-            'content': 'O Comitê de Política Monetária (Copom) do Banco Central decidiu manter a taxa básica de juros em 10,75% ao ano. A decisão foi unânime e reflete a estratégia de controle inflacionário adotada pela instituição nos últimos meses.',
+            'content': 'O Comitê de Política Monetária (Copom) do Banco Central decidiu manter a taxa básica de juros em 10,75% ao ano. A decisão foi unânime e reflete a estratégia de controle inflacionário adotada pela instituição nos últimos meses. O BC destacou a importância de manter a estabilidade de preços como prioridade.',
             'summary': 'Copom mantém Selic estável em decisão unânime',
             'tags': ['selic', 'juros', 'copom', 'economia']
         },
         {
             'title': 'PIB brasileiro cresce 2,1% no terceiro trimestre',
-            'content': 'O Produto Interno Bruto (PIB) brasileiro registrou crescimento de 2,1% no terceiro trimestre deste ano, segundo dados do IBGE. O resultado superou expectativas de analistas e consolida tendência de recuperação econômica.',
+            'content': 'O Produto Interno Bruto (PIB) brasileiro registrou crescimento de 2,1% no terceiro trimestre deste ano, segundo dados do IBGE. O resultado superou expectativas de analistas e consolida tendência de recuperação econômica. Os setores de serviços e indústria foram os principais responsáveis pelo crescimento.',
             'summary': 'PIB supera expectativas com crescimento de 2,1%',
             'tags': ['pib', 'crescimento', 'ibge', 'economia']
+        },
+        {
+            'title': 'Inflação registra alta de 0,46% em novembro',
+            'content': 'O Índice de Preços ao Consumidor Amplo (IPCA) registrou alta de 0,46% em novembro, segundo o IBGE. No acumulado do ano, a inflação soma 4,62%, mantendo-se dentro da meta estabelecida pelo governo. Os grupos de alimentação e transporte foram os que mais pressionaram o índice.',
+            'summary': 'IPCA sobe 0,46% e inflação anual fica em 4,62%',
+            'tags': ['inflacao', 'ipca', 'precos', 'economia']
         }
     ],
     'tecnologia': [
         {
             'title': 'Nova lei de proteção de dados pessoais entra em vigor',
-            'content': 'Entra em vigor hoje a nova regulamentação sobre proteção de dados pessoais no setor público brasileiro. A norma estabelece critérios mais rigorosos para coleta, tratamento e armazenamento de informações dos cidadãos.',
+            'content': 'Entra em vigor hoje a nova regulamentação sobre proteção de dados pessoais no setor público brasileiro. A norma estabelece critérios mais rigorosos para coleta, tratamento e armazenamento de informações dos cidadãos. As instituições públicas têm prazo de 180 dias para adequação.',
             'summary': 'Proteção de dados no setor público ganha nova regulamentação',
             'tags': ['lgpd', 'dados', 'privacidade', 'digital']
+        },
+        {
+            'title': 'Brasil lança programa de inovação tecnológica',
+            'content': 'O governo brasileiro anunciou hoje novo programa de incentivo à inovação tecnológica, com foco em startups e empresas de base tecnológica. O programa prevê investimentos de R$ 2 bilhões em cinco anos e criação de incubadoras em universidades públicas.',
+            'summary': 'Novo programa investirá R$ 2 bi em inovação tecnológica',
+            'tags': ['inovacao', 'startup', 'tecnologia', 'investimento']
         }
     ],
     'internacional': [
         {
             'title': 'Brasil assina acordo comercial com países do Mercosul',
-            'content': 'O Brasil formalizou hoje novo acordo comercial com países membros do Mercosul, visando facilitar o comércio bilateral e reduzir barreiras tarifárias. O acordo deve impactar positivamente o PIB regional.',
+            'content': 'O Brasil formalizou hoje novo acordo comercial com países membros do Mercosul, visando facilitar o comércio bilateral e reduzir barreiras tarifárias. O acordo deve impactar positivamente o PIB regional e fortalecer a integração econômica sul-americana.',
             'summary': 'Novo acordo comercial fortalece integração no Mercosul',
             'tags': ['mercosul', 'comercio', 'integracao', 'economia']
+        },
+        {
+            'title': 'Diplomacia brasileira articula parcerias estratégicas',
+            'content': 'O Ministério das Relações Exteriores anunciou novas iniciativas diplomáticas para fortalecer parcerias estratégicas com países da América Latina e África. As negociações incluem acordos de cooperação tecnológica e intercâmbio educacional.',
+            'summary': 'Brasil amplia parcerias estratégicas internacionais',
+            'tags': ['diplomacia', 'cooperacao', 'internacional', 'parcerias']
         }
     ]
 }
@@ -127,7 +151,7 @@ def create_users_and_profiles():
             }
         )
         if created:
-            user.set_password('demo123')
+            user.set_password('demo12345')  # Fixed: 8+ characters
             user.save()
             print(f"✅ Created user: {user.username}")
         
@@ -168,20 +192,21 @@ def create_api_keys(users):
     return api_keys
 
 def create_tags():
-    """Create relevant tags"""
+    """Create relevant tags (Fixed: removed is_active field)"""
     tag_names = [
         'urgente', 'breaking', 'exclusiva', 'investigacao', 'politica', 'economia',
         'justica', 'congresso', 'stf', 'eleicoes', 'orcamento', 'impostos',
         'mercado', 'investimentos', 'inflacao', 'pib', 'copom', 'selic',
         'tecnologia', 'inovacao', 'sustentabilidade', 'meio-ambiente',
-        'internacional', 'mercosul', 'comercio', 'diplomacia'
+        'internacional', 'mercosul', 'comercio', 'diplomacia', 'transparencia',
+        'lgpd', 'dados', 'privacidade', 'digital', 'startup', 'cooperacao'
     ]
     
     created_tags = []
     for tag_name in tag_names:
         tag, created = Tag.objects.get_or_create(
-            name=tag_name,
-            defaults={'is_active': True}
+            name=tag_name
+            # Fixed: removed is_active field as it doesn't exist in Tag model
         )
         created_tags.append(tag)
         if created:
@@ -190,7 +215,7 @@ def create_tags():
     return created_tags
 
 def create_news_articles(categories, users, tags):
-    """Create realistic news articles"""
+    """Create realistic news articles (Fixed: removed non-existent fields)"""
     articles_created = 0
     
     for i in range(50):  # Create 50 articles
@@ -225,6 +250,9 @@ def create_news_articles(categories, users, tags):
             minutes=random.randint(0, 59)
         )
         
+        # Generate unique external_id
+        external_id = f'demo-{category.slug}-{i+1}-{str(uuid.uuid4())[:8]}'
+        
         news = News.objects.create(
             title=title,
             content=content,
@@ -232,17 +260,12 @@ def create_news_articles(categories, users, tags):
             category=category,
             author=author,
             source=random.choice(['JOTA', 'Agência Brasil', 'Reuters', 'G1']),
+            external_id=external_id,  # Added unique external_id
             is_published=True,
             is_urgent=is_urgent,
-            priority=random.choice(['low', 'medium', 'high', 'urgent']),
             published_at=published_at,
-            created_at=published_at,
-            metadata={
-                'source_url': f'https://example.com/news/{i+1}',
-                'reading_time': random.randint(2, 15),
-                'word_count': len(content.split()),
-                'classification_confidence': random.uniform(0.7, 0.95)
-            }
+            created_at=published_at
+            # Fixed: removed priority and metadata fields as they don't exist
         )
         
         # Add tags
@@ -265,7 +288,7 @@ def create_news_articles(categories, users, tags):
     return articles_created
 
 def create_notification_channels():
-    """Create notification channels"""
+    """Create notification channels (Fixed: removed WhatsApp and fixed rate_limit)"""
     channels_data = [
         {
             'name': 'Email Notifications',
@@ -277,19 +300,27 @@ def create_notification_channels():
             }
         },
         {
-            'name': 'WhatsApp Business',
-            'channel_type': 'whatsapp',
-            'config': {
-                'api_url': 'https://api.whatsapp.com/send',
-                'token': 'demo_token_123'
-            }
-        },
-        {
             'name': 'Slack Notifications',
             'channel_type': 'slack',
             'config': {
                 'webhook_url': 'https://hooks.slack.com/demo',
                 'channel': '#news-alerts'
+            }
+        },
+        {
+            'name': 'SMS Notifications',
+            'channel_type': 'sms',
+            'config': {
+                'provider': 'twilio',
+                'from_number': '+5511999999999'
+            }
+        },
+        {
+            'name': 'Webhook Notifications',
+            'channel_type': 'webhook',
+            'config': {
+                'endpoint_url': 'https://api.example.com/webhook',
+                'secret_key': 'demo_webhook_secret_123'
             }
         }
     ]
@@ -302,7 +333,8 @@ def create_notification_channels():
                 'channel_type': channel_data['channel_type'],
                 'config': channel_data['config'],
                 'is_active': True,
-                'rate_limit': 100
+                'rate_limit_per_minute': 100,  # Fixed: use correct field name
+                'rate_limit_per_hour': 1000    # Fixed: use correct field name
             }
         )
         created_channels.append(channel)
@@ -312,47 +344,36 @@ def create_notification_channels():
     return created_channels
 
 def create_webhook_sources():
-    """Create webhook sources"""
+    """Create webhook sources (Fixed: use only existing fields)"""
     sources_data = [
         {
             'name': 'Agência Brasil Feed',
-            'slug': 'agencia-brasil',
-            'source_type': 'rss',
-            'config': {
-                'feed_url': 'https://agenciabrasil.ebc.com.br/rss/ultimasnoticias/feed.xml',
-                'update_interval': 300
-            }
+            'endpoint_url': 'https://api.jota.news/webhooks/agencia-brasil',
+            'description': 'Recebe notícias da Agência Brasil via webhook'
         },
         {
-            'name': 'WhatsApp Business Webhook',
-            'slug': 'whatsapp-business',
-            'source_type': 'whatsapp',
-            'config': {
-                'verify_token': 'jota_verify_token_123',
-                'app_secret': 'demo_app_secret'
-            }
+            'name': 'Demo External Source',
+            'endpoint_url': 'https://api.jota.news/webhooks/demo-source',
+            'description': 'Fonte de demonstração para testes'
         },
         {
-            'name': 'Telegram Bot',
-            'slug': 'telegram-bot',
-            'source_type': 'telegram',
-            'config': {
-                'bot_token': 'demo_bot_token_456',
-                'webhook_url': 'https://api.telegram.org/bot'
-            }
+            'name': 'Load Test Source',
+            'endpoint_url': 'https://api.jota.news/webhooks/load-test',
+            'description': 'Fonte para testes de carga e performance'
         }
     ]
     
     created_sources = []
     for source_data in sources_data:
         source, created = WebhookSource.objects.get_or_create(
-            slug=source_data['slug'],
+            name=source_data['name'],
             defaults={
-                'name': source_data['name'],
-                'source_type': source_data['source_type'],
-                'config': source_data['config'],
+                'endpoint_url': source_data['endpoint_url'],
+                'description': source_data['description'],
                 'is_active': True,
-                'rate_limit': 1000
+                'requires_authentication': False,
+                'rate_limit_per_minute': 1000
+                # Fixed: only use fields that exist in the model
             }
         )
         created_sources.append(source)
@@ -360,6 +381,47 @@ def create_webhook_sources():
             print(f"✅ Created webhook source: {source.name}")
     
     return created_sources
+
+def create_notification_subscriptions(users, channels):
+    """Create notification subscriptions for users"""
+    subscriptions_created = 0
+    
+    for user in users:
+        # Subscribe to email notifications
+        email_channel = next((c for c in channels if c.channel_type == 'email'), None)
+        if email_channel:
+            subscription, created = NotificationSubscription.objects.get_or_create(
+                user=user,
+                channel=email_channel,
+                defaults={
+                    'destination': user.email,
+                    'is_active': True,
+                    'min_priority': 'medium',
+                    'urgent_only': False
+                }
+            )
+            if created:
+                subscriptions_created += 1
+        
+        # Some users get Slack notifications
+        if random.random() < 0.3:  # 30% chance
+            slack_channel = next((c for c in channels if c.channel_type == 'slack'), None)
+            if slack_channel:
+                subscription, created = NotificationSubscription.objects.get_or_create(
+                    user=user,
+                    channel=slack_channel,
+                    defaults={
+                        'destination': f'@{user.username}',
+                        'is_active': True,
+                        'min_priority': 'high',
+                        'urgent_only': True
+                    }
+                )
+                if created:
+                    subscriptions_created += 1
+    
+    print(f"✅ Created {subscriptions_created} notification subscriptions")
+    return subscriptions_created
 
 def main():
     """Main function to generate all demo data"""
@@ -395,6 +457,10 @@ def main():
         print("\n🔗 Creating webhook sources...")
         sources = create_webhook_sources()
         
+        # Create notification subscriptions
+        print("\n🔔 Creating notification subscriptions...")
+        subscriptions_count = create_notification_subscriptions(users, channels)
+        
         print("\n" + "=" * 60)
         print("✅ Demo data generation completed successfully!")
         print(f"📊 Summary:")
@@ -405,7 +471,12 @@ def main():
         print(f"   - News Articles: {articles_count}")
         print(f"   - Notification Channels: {len(channels)}")
         print(f"   - Webhook Sources: {len(sources)}")
+        print(f"   - Notification Subscriptions: {subscriptions_count}")
         print("\n🎯 System is ready for demonstration!")
+        print("\n📋 Demo Login Credentials:")
+        print("   - Admin: admin@jota.news / demo12345")
+        print("   - Editor: editor.politica@jota.news / demo12345")
+        print("   - Journalist: jornalista1@jota.news / demo12345")
         
     except Exception as e:
         print(f"❌ Error generating demo data: {str(e)}")

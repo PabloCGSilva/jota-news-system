@@ -10,6 +10,128 @@
 
 > **Professional-grade news processing platform with AI classification, real-time monitoring, and multi-channel notifications. Zero external dependencies architecture with enterprise reliability.**
 
+## Quick Start - Production Deployment
+
+### Prerequisites Validation
+```bash
+# System Requirements Check
+docker --version          # >= 20.10
+docker-compose --version  # >= 2.0
+python --version          # >= 3.11
+free -h                    # Verify 4GB+ RAM available
+df -h                      # Verify 2GB+ disk space free
+```
+
+**Minimum Requirements:**
+- **Memory**: 4GB+ RAM (optimized for constrained environments)
+- **Disk**: 2GB+ free space for Docker images and data
+- **Ports**: 8000, 3000, 5432, 6379 (automatically checked during setup)
+
+### One-Command Setup
+```bash
+# Clone and deploy in under 3 minutes
+git clone https://github.com/PabloCGSilva/jota-news-system.git
+cd jota-news-system
+chmod +x setup_and_test.sh
+./setup_and_test.sh
+```
+
+**Advanced Setup Options:**
+```bash
+# Quick setup without tests
+./setup_and_test.sh --skip-tests
+
+# Minimal setup (faster)
+./setup_and_test.sh --quick
+
+# View all options
+./setup_and_test.sh --help
+```
+
+### Automated Health Verification
+The setup script automatically validates system health with comprehensive checks:
+
+```bash
+# Built-in validation during setup (automatic)
+./setup_and_test.sh
+
+# Manual health check (optional)
+python3 test_runner.py --health
+
+# Expected validation output:
+# ✓ Memory check passed: 8192MB available
+# ✓ Disk space check passed  
+# ✓ Docker daemon is running
+# ✓ health/ is responding
+# ✓ api/ is responding
+# ✓ health (Grafana) is responding
+# ✓ Database connectivity verified
+# ✓ Redis connectivity verified
+# ✓ All systems are operational!
+```
+
+**What gets validated automatically:**
+- System memory and disk space requirements
+- Docker daemon availability and version
+- Port availability and conflict detection  
+- All service endpoints responding correctly
+- Database and Redis connectivity
+- Complete system readiness verification
+
+### Access Points After Setup
+
+**Main Dashboards:**
+- **API Documentation**: http://localhost:8000/api/docs/
+- **Grafana Monitoring**: http://localhost:3000 (admin/admin)
+- **Demo Dashboard**: http://localhost:8000/demo/
+- **Health Status**: http://localhost:8000/health/
+
+**Testing and Validation:**
+```bash
+# Interactive demo mode with menu options
+python3 test_runner.py --demo
+
+# Run all tests (unit, integration, performance, monitoring)
+python3 test_runner.py --all
+
+# Health checks only
+python3 test_runner.py --health
+```
+
+### CI/CD Pipeline Setup
+
+**GitHub Actions - Automated DevOps Pipeline**
+
+**Step 1: Push to GitHub**
+```bash
+# Create GitHub repository at github.com
+# Then push your code:
+git remote add origin https://github.com/YOUR_USERNAME/jota-news-system.git
+git push -u origin main
+```
+
+**Step 2: Watch Automation**
+- Go to your GitHub repository
+- Click the **"Actions"** tab
+- Watch your automated pipeline run!
+
+**Pipeline Features:**
+- Automated testing (runs all 143 tests on every push)
+- Code quality automation (Black, flake8, isort)
+- Security scanning (Bandit, Safety, Trivy)
+- Smart deployment (develop branch → staging, main branch → production)
+- Monitoring and notifications (Slack integration, health checks)
+
+**Authentication Setup:**
+GitHub requires Personal Access Token (not password):
+1. GitHub.com → Settings → Developer settings → Personal access tokens
+2. Generate new token with `repo` permissions
+3. Use token as password when pushing
+
+For detailed CI/CD setup: **[GITHUB_ACTIONS_SETUP.md](GITHUB_ACTIONS_SETUP.md)**
+
+---
+
 ## Executive Summary
 
 The JOTA News System is a **production-ready, enterprise-grade** news processing platform demonstrating advanced software engineering principles. Built with a **zero-waste architecture** that eliminates external API dependencies for simplified deployment.
@@ -660,7 +782,7 @@ curl http://localhost:8000/security/health/
 
 ## CI/CD Pipeline
 
-### 🚀 GitHub Actions - Automated DevOps Pipeline
+### GitHub Actions - Automated DevOps Pipeline
 
 The JOTA News System includes a **production-ready CI/CD pipeline** using GitHub Actions for automated testing, security scanning, and deployment.
 
@@ -674,38 +796,38 @@ git remote add origin https://github.com/YOUR_USERNAME/jota-news-system.git
 git push -u origin main
 ```
 
-**Step 2: Watch Magic Happen ✨**
+**Step 2: Watch Automation Execute**
 - Go to your GitHub repository
 - Click the **"Actions"** tab
 - Watch your automated pipeline run!
 
 #### **Pipeline Features**
 
-✅ **Automated Testing**
+**Automated Testing**
 - Runs all 143 tests on every push
 - Integration tests with real PostgreSQL/Redis
 - Performance testing with k6 load testing
 - 100% test success rate validation
 
-✅ **Code Quality Automation**
+**Code Quality Automation**
 - Code formatting (Black)
 - Linting (flake8)
 - Import sorting (isort)
 - Security scanning (Bandit, Safety)
 
-✅ **Security First**
+**Security First**
 - Container vulnerability scanning (Trivy)
 - Dependency security checks
 - Secrets detection
 - SAST integration
 
-✅ **Smart Deployment**
+**Smart Deployment**
 - **develop branch** → Auto-deploy to staging
 - **main branch** → Auto-deploy to production (with approval)
 - Zero-downtime rolling deployments
 - Automatic rollback on failure
 
-✅ **Monitoring & Notifications**
+**Monitoring & Notifications**
 - Slack notifications for deployment status
 - Performance benchmarking
 - Health checks after deployment
@@ -764,25 +886,25 @@ quality-checks → test → build → integration-test → security → deploy
 
 #### **Enterprise Benefits**
 
-🏢 **Enterprise-Grade Automation**
+**Enterprise-Grade Automation**
 - No manual deployments
 - Consistent quality gates
 - Audit trail for all changes
 - Compliance reporting
 
-⚡ **Developer Productivity**
+**Developer Productivity**
 - Instant feedback on code changes
 - Automated code formatting
 - Pre-commit hooks integration
 - Simplified deployment process
 
-🔒 **Security & Compliance**
+**Security & Compliance**
 - Every change is tested and scanned
 - Security vulnerabilities caught early
 - Dependency management automation
 - Access control and approvals
 
-📊 **Quality Assurance**
+**Quality Assurance**
 - 100% test success requirement
 - Code coverage tracking
 - Performance regression prevention
@@ -798,7 +920,7 @@ The guide includes:
 - Troubleshooting common issues
 - Advanced configuration options
 
-**Ready to deploy? Just push to GitHub! 🚀**
+**Ready to deploy? Just push to GitHub!**
 
 ---
 
