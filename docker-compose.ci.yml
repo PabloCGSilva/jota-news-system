@@ -1,0 +1,113 @@
+version: '3.8'
+
+# CI/CD optimized Docker Compose configuration
+# Lighter services for faster CI builds and tests
+
+services:
+  # Test Database
+  db-test:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_DB=jota_news_test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    tmpfs:
+      - /var/lib/postgresql/data
+    command: >
+      postgres 
+        -c shared_preload_libraries=pg_stat_statements
+        -c max_connections=100
+        -c shared_buffers=128MB
+        -c effective_cache_size=512MB
+        -c maintenance_work_mem=64MB
+        -c checkpoint_completion_target=0.9
+        -c wal_buffers=16MB
+        -c default_statistics_target=100
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Test Redis
+  redis-test:
+    image: redis:7-alpine
+    tmpfs:
+      - /data
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Test API
+  api-test:
+    build: 
+      context: ./services/api
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db-test:5432/jota_news_test
+      - REDIS_URL=redis://redis-test:6379/0
+      - CELERY_BROKER_URL=redis://redis-test:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis-test:6379/0
+      - DJANGO_SETTINGS_MODULE=jota_news.test_settings
+      - PYTHONPATH=/app
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    volumes:
+      - ./services/api:/app
+    command: python manage.py test --keepdb --parallel auto
+    
+  # Integration Test Runner
+  integration-test:
+    build: 
+      context: ./services/api
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db-test:5432/jota_news_test
+      - REDIS_URL=redis://redis-test:6379/0
+      - CELERY_BROKER_URL=redis://redis-test:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis-test:6379/0
+      - DJANGO_SETTINGS_MODULE=jota_news.test_settings
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    volumes:
+      - ./services/api:/app
+    command: |
+      bash -c "
+        python manage.py migrate &&
+        python manage.py setup_nltk &&
+        python manage.py test tests.integration --keepdb
+      "
+      
+  # Load Test Runner
+  load-test:
+    image: grafana/k6:latest
+    volumes:
+      - ./tests/load:/scripts
+    environment:
+      - API_BASE_URL=http://api-test:8000
+    depends_on:
+      - api-test
+    command: run /scripts/load-test.js
+    
+  # Security Scanner
+  security-scan:
+    image: aquasec/trivy:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/workspace
+    working_dir: /workspace
+    command: |
+      sh -c "
+        trivy fs --security-checks vuln,config services/api/ &&
+        trivy image jota-news-api:latest
+      "

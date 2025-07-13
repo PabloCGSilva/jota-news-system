@@ -1,0 +1,238 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Automated Code Review
+  code-review:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install review tools
+      run: |
+        pip install flake8 bandit safety mypy
+        
+    - name: Run automated code review
+      run: |
+        echo "## Code Review Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Check for TODO/FIXME comments
+        if grep -r "TODO\|FIXME\|XXX" services/api/ --exclude-dir=__pycache__ || true; then
+          echo "### ⚠️ Found TODO/FIXME comments" >> $GITHUB_STEP_SUMMARY
+          grep -r "TODO\|FIXME\|XXX" services/api/ --exclude-dir=__pycache__ >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Check for print statements (should use logging)
+        if grep -r "print(" services/api/ --exclude-dir=__pycache__ || true; then
+          echo "### ⚠️ Found print statements (use logging instead)" >> $GITHUB_STEP_SUMMARY
+          grep -r "print(" services/api/ --exclude-dir=__pycache__ >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Check for hardcoded secrets patterns
+        if grep -rE "(password|secret|key|token)\s*=\s*['\"][^'\"]+['\"]" services/api/ --exclude-dir=__pycache__ || true; then
+          echo "### 🚨 Potential hardcoded secrets found" >> $GITHUB_STEP_SUMMARY
+          echo "Please review these patterns carefully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+
+  # Test Coverage Check
+  coverage-check:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: jota_news_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r services/api/requirements.txt
+        pip install coverage pytest-cov
+        
+    - name: Setup NLTK data
+      run: |
+        cd services/api
+        python manage.py setup_nltk
+        
+    - name: Run migrations
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jota_news_test
+        REDIS_URL: redis://localhost:6379/0
+      run: |
+        cd services/api
+        python manage.py migrate
+        
+    - name: Run tests with coverage
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jota_news_test
+        REDIS_URL: redis://localhost:6379/0
+        CELERY_BROKER_URL: redis://localhost:6379/0
+        CELERY_RESULT_BACKEND: redis://localhost:6379/0
+      run: |
+        cd services/api
+        coverage run --source='.' manage.py test
+        coverage report --show-missing
+        coverage json
+        
+    - name: Coverage comment
+      uses: py-cov-action/python-coverage-comment-action@v3
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERAGE_FILE: services/api/coverage.json
+
+  # Performance Impact Check
+  performance-impact:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check for performance-impacting changes
+      run: |
+        echo "## Performance Impact Analysis" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Check for database migrations
+        if git diff --name-only origin/main...HEAD | grep -E "migrations/.*\.py$"; then
+          echo "### 📊 Database migrations detected" >> $GITHUB_STEP_SUMMARY
+          echo "Please ensure migrations are optimized and won't cause downtime" >> $GITHUB_STEP_SUMMARY
+          git diff --name-only origin/main...HEAD | grep -E "migrations/.*\.py$" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Check for model changes
+        if git diff origin/main...HEAD -- "*/models.py" | grep -E "^\+.*class.*Model" || git diff origin/main...HEAD -- "*/models.py" | grep -E "^\+.*Field"; then
+          echo "### 🗄️ Model changes detected" >> $GITHUB_STEP_SUMMARY
+          echo "Please review for performance implications" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Check for new dependencies
+        if git diff origin/main...HEAD -- requirements.txt; then
+          echo "### 📦 Dependency changes detected" >> $GITHUB_STEP_SUMMARY
+          echo "New dependencies:" >> $GITHUB_STEP_SUMMARY
+          git diff origin/main...HEAD -- requirements.txt | grep "^\+" | grep -v "^\+++" >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+
+  # Documentation Check
+  docs-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check documentation updates
+      run: |
+        echo "## Documentation Review" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Check if new API endpoints need documentation
+        if git diff origin/main...HEAD -- "*/urls.py" "*/views.py" | grep -E "^\+.*def.*|^\+.*path.*|^\+.*url.*"; then
+          echo "### 📚 New API endpoints detected" >> $GITHUB_STEP_SUMMARY
+          echo "Please ensure API documentation is updated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Check if README needs updates for new features
+        if git diff --name-only origin/main...HEAD | grep -E "\.(py)$" | wc -l | awk '{if($1 > 5) print "Many files changed"}' | grep -q "Many"; then
+          echo "### 📖 Consider updating README.md" >> $GITHUB_STEP_SUMMARY
+          echo "Many files changed - please review if README needs updates" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+
+  # Security Pre-check
+  security-precheck:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install security tools
+      run: |
+        pip install bandit safety semgrep
+        
+    - name: Run Bandit security check
+      run: |
+        bandit -r services/api/ -f json -o bandit-report.json || true
+        
+    - name: Run Safety dependency check
+      run: |
+        safety check --json --output safety-report.json || true
+        
+    - name: Run Semgrep
+      run: |
+        semgrep --config=auto services/api/ --json --output=semgrep-report.json || true
+        
+    - name: Comment security findings
+      run: |
+        echo "## Security Analysis" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -s bandit-report.json ]; then
+          echo "### 🔒 Bandit Security Findings" >> $GITHUB_STEP_SUMMARY
+          python -c "
+import json
+with open('bandit-report.json') as f:
+    data = json.load(f)
+    if data.get('results'):
+        print(f'Found {len(data[\"results\"])} security issues')
+        for issue in data['results'][:5]:  # Show first 5
+            print(f'- {issue[\"test_name\"]}: {issue[\"issue_text\"]}')
+    else:
+        print('No security issues found')
+" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi

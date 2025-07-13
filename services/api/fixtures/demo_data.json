@@ -1,0 +1,147 @@
+[
+  {
+    "model": "news.category",
+    "pk": "550e8400-e29b-41d4-a716-446655440001",
+    "fields": {
+      "name": "Política",
+      "slug": "politica",
+      "description": "Notícias sobre política nacional e internacional",
+      "keywords": ["política", "governo", "eleições", "partidos"],
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.category",
+    "pk": "550e8400-e29b-41d4-a716-446655440002",
+    "fields": {
+      "name": "Economia",
+      "slug": "economia",
+      "description": "Notícias sobre economia e finanças",
+      "keywords": ["economia", "mercado", "inflação", "juros"],
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.subcategory",
+    "pk": "550e8400-e29b-41d4-a716-446655440003",
+    "fields": {
+      "name": "Congresso",
+      "slug": "congresso",
+      "description": "Notícias sobre o Congresso Nacional",
+      "category": "550e8400-e29b-41d4-a716-446655440001",
+      "keywords": ["congresso", "câmara", "senado", "deputados"],
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.subcategory",
+    "pk": "550e8400-e29b-41d4-a716-446655440004",
+    "fields": {
+      "name": "Mercado Financeiro",
+      "slug": "mercado-financeiro",
+      "description": "Notícias sobre mercados financeiros",
+      "category": "550e8400-e29b-41d4-a716-446655440002",
+      "keywords": ["bolsa", "ações", "investimentos", "bancos"],
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.tag",
+    "pk": "550e8400-e29b-41d4-a716-446655440005",
+    "fields": {
+      "name": "Breaking News",
+      "slug": "breaking-news",
+      "description": "Notícias de última hora",
+      "usage_count": 15,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.tag",
+    "pk": "550e8400-e29b-41d4-a716-446655440006",
+    "fields": {
+      "name": "Urgente",
+      "slug": "urgente",
+      "description": "Notícias urgentes",
+      "usage_count": 8,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "webhooks.webhooksource",
+    "pk": "550e8400-e29b-41d4-a716-446655440007",
+    "fields": {
+      "name": "Demo News API",
+      "slug": "demo-news-api",
+      "description": "API de demonstração para testes",
+      "url": "https://demo-api.jota.news/webhook",
+      "secret_key": "demo-secret-key-12345",
+      "content_type": "application/json",
+      "is_active": true,
+      "rate_limit_per_minute": 100,
+      "rate_limit_per_hour": 1000,
+      "total_received": 0,
+      "total_processed": 0,
+      "total_failed": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "notifications.notificationchannel",
+    "pk": "550e8400-e29b-41d4-a716-446655440008",
+    "fields": {
+      "name": "Email Demo",
+      "channel_type": "email",
+      "description": "Canal de email para demonstração",
+      "config": {
+        "smtp_server": "smtp.demo.com",
+        "smtp_port": 587,
+        "username": "demo@jota.news",
+        "use_tls": true
+      },
+      "is_active": true,
+      "is_default": true,
+      "rate_limit_per_minute": 60,
+      "rate_limit_per_hour": 1000,
+      "total_sent": 0,
+      "total_delivered": 0,
+      "total_failed": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "notifications.notificationchannel",
+    "pk": "550e8400-e29b-41d4-a716-446655440009",
+    "fields": {
+      "name": "WhatsApp Demo",
+      "channel_type": "whatsapp",
+      "description": "Canal WhatsApp para demonstração",
+      "config": {
+        "api_url": "https://graph.facebook.com/v18.0",
+        "phone_number_id": "demo-phone-id",
+        "access_token": "demo-access-token"
+      },
+      "is_active": true,
+      "is_default": false,
+      "rate_limit_per_minute": 30,
+      "rate_limit_per_hour": 500,
+      "total_sent": 0,
+      "total_delivered": 0,
+      "total_failed": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  }
+]

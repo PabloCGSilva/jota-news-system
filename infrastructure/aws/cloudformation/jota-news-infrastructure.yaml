@@ -1,0 +1,653 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'JOTA News System - Scalable Infrastructure with Lambda, SQS, SNS, and RDS Aurora'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: 'production'
+    AllowedValues:
+      - development
+      - staging
+      - production
+    Description: 'Environment name'
+  
+  VpcCidr:
+    Type: String
+    Default: '10.0.0.0/16'
+    Description: 'VPC CIDR block'
+  
+  DatabaseMasterUsername:
+    Type: String
+    Default: 'jota_admin'
+    Description: 'Database master username'
+  
+  DatabaseMasterPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 8
+    MaxLength: 41
+    Description: 'Database master password'
+  
+  WhatsAppAccessToken:
+    Type: String
+    NoEcho: true
+    Description: 'WhatsApp Business API access token'
+  
+  WhatsAppPhoneNumberId:
+    Type: String
+    Description: 'WhatsApp Business phone number ID'
+
+Resources:
+  # VPC and Networking
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-vpc'
+  
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.1.0/24'
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-private-subnet-1'
+  
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.2.0/24'
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-private-subnet-2'
+  
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.10.0/24'
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-public-subnet-1'
+  
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.11.0/24'
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-public-subnet-2'
+  
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-igw'
+  
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+  
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway1EIP.AllocationId
+      SubnetId: !Ref PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-nat-1'
+  
+  NatGateway1EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+  
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-public-rt'
+  
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+  
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+  
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+  
+  PrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-private-rt-1'
+  
+  DefaultPrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref NatGateway1
+  
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet1
+  
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet2
+
+  # Security Groups
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Security group for Lambda functions'
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: '0.0.0.0/0'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-lambda-sg'
+  
+  DatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Security group for RDS Aurora cluster'
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref LambdaSecurityGroup
+          Description: 'PostgreSQL access from Lambda'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-rds-sg'
+  
+  # RDS Aurora Serverless v2 PostgreSQL
+  DatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: 'Subnet group for JOTA News database'
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-db-subnet-group'
+  
+  DatabaseCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora-postgresql
+      EngineVersion: '15.4'
+      EngineMode: provisioned
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: 0.5
+        MaxCapacity: 16
+      DatabaseName: jota_news
+      MasterUsername: !Ref DatabaseMasterUsername
+      MasterUserPassword: !Ref DatabaseMasterPassword
+      DBSubnetGroupName: !Ref DatabaseSubnetGroup
+      VpcSecurityGroupIds:
+        - !Ref DatabaseSecurityGroup
+      BackupRetentionPeriod: 7
+      PreferredBackupWindow: '03:00-04:00'
+      PreferredMaintenanceWindow: 'sun:04:00-sun:05:00'
+      EnableCloudwatchLogsExports:
+        - postgresql
+      DeletionProtection: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-db-cluster'
+  
+  DatabasePrimaryInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: aurora-postgresql
+      DBInstanceClass: db.serverless
+      DBClusterIdentifier: !Ref DatabaseCluster
+      PubliclyAccessible: false
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-db-primary'
+  
+  # Secrets Manager for Database
+  DatabaseSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub '${Environment}-jota-news-db-secret'
+      Description: 'Database credentials for JOTA News system'
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username": "${DatabaseMasterUsername}"}'
+        GenerateStringKey: 'password'
+        PasswordLength: 32
+        ExcludeCharacters: '"@/\'
+  
+  DatabaseSecretAttachment:
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId: !Ref DatabaseSecret
+      TargetId: !Ref DatabaseCluster
+      TargetType: AWS::RDS::DBCluster
+  
+  # SQS Queues
+  NewsProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${Environment}-jota-news-processing-queue'
+      MessageRetentionPeriod: 1209600  # 14 days
+      VisibilityTimeoutSeconds: 300
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt NewsProcessingDLQ.Arn
+        maxReceiveCount: 3
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-processing-queue'
+  
+  NewsProcessingDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${Environment}-jota-news-processing-dlq'
+      MessageRetentionPeriod: 1209600  # 14 days
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-processing-dlq'
+  
+  ClassificationQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${Environment}-jota-news-classification-queue'
+      MessageRetentionPeriod: 1209600  # 14 days
+      VisibilityTimeoutSeconds: 600  # 10 minutes for ML processing
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt ClassificationDLQ.Arn
+        maxReceiveCount: 3
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-classification-queue'
+  
+  ClassificationDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${Environment}-jota-news-classification-dlq'
+      MessageRetentionPeriod: 1209600  # 14 days
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-classification-dlq'
+  
+  # SNS Topics
+  NotificationsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub '${Environment}-jota-news-notifications'
+      DisplayName: 'JOTA News Notifications'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-notifications'
+  
+  UrgentNewsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub '${Environment}-jota-news-urgent'
+      DisplayName: 'JOTA News Urgent Notifications'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-urgent'
+  
+  # Lambda Execution Role
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${Environment}-jota-news-lambda-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: JotaNewsLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - rds-data:BeginTransaction
+                  - rds-data:CommitTransaction
+                  - rds-data:ExecuteStatement
+                  - rds-data:RollbackTransaction
+                Resource: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Ref DatabaseSecret
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                Resource:
+                  - !GetAtt NewsProcessingQueue.Arn
+                  - !GetAtt ClassificationQueue.Arn
+                  - !GetAtt NewsProcessingDLQ.Arn
+                  - !GetAtt ClassificationDLQ.Arn
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource:
+                  - !Ref NotificationsTopic
+                  - !Ref UrgentNewsTopic
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+  
+  # Lambda Functions
+  NewsProcessorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${Environment}-jota-news-processor'
+      Runtime: python3.11
+      Handler: news_processor.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': 'News processor placeholder'
+              }
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+          CLASSIFICATION_QUEUE_URL: !Ref ClassificationQueue
+          NOTIFICATION_TOPIC_ARN: !Ref NotificationsTopic
+          URGENT_NEWS_TOPIC_ARN: !Ref UrgentNewsTopic
+          DATABASE_SECRET_ARN: !Ref DatabaseSecret
+          DATABASE_CLUSTER_ARN: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}'
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      ReservedConcurrencyLimit: 100
+      Timeout: 300
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-processor'
+  
+  ClassificationProcessorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${Environment}-jota-classification-processor'
+      Runtime: python3.11
+      Handler: classification_processor.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': 'Classification processor placeholder'
+              }
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+          NOTIFICATION_TOPIC_ARN: !Ref NotificationsTopic
+          DATABASE_SECRET_ARN: !Ref DatabaseSecret
+          DATABASE_CLUSTER_ARN: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}'
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      ReservedConcurrencyLimit: 50
+      Timeout: 600  # 10 minutes for ML processing
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-classification-processor'
+  
+  NotificationProcessorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${Environment}-jota-notification-processor'
+      Runtime: python3.11
+      Handler: notification_processor.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': 'Notification processor placeholder'
+              }
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+          DATABASE_SECRET_ARN: !Ref DatabaseSecret
+          DATABASE_CLUSTER_ARN: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}'
+          WHATSAPP_ACCESS_TOKEN: !Ref WhatsAppAccessToken
+          WHATSAPP_PHONE_NUMBER_ID: !Ref WhatsAppPhoneNumberId
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      ReservedConcurrencyLimit: 200
+      Timeout: 300
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-notification-processor'
+  
+  # Event Source Mappings
+  NewsProcessingEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt NewsProcessingQueue.Arn
+      FunctionName: !GetAtt NewsProcessorFunction.Arn
+      BatchSize: 10
+      MaximumBatchingWindowInSeconds: 5
+  
+  ClassificationEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt ClassificationQueue.Arn
+      FunctionName: !GetAtt ClassificationProcessorFunction.Arn
+      BatchSize: 5
+      MaximumBatchingWindowInSeconds: 10
+  
+  NotificationEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !Ref NotificationsTopic
+      FunctionName: !GetAtt NotificationProcessorFunction.Arn
+      Protocol: lambda
+  
+  # CloudWatch Alarms
+  NewsProcessingQueueAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${Environment}-jota-news-processing-queue-alarm'
+      AlarmDescription: 'Alarm for news processing queue depth'
+      MetricName: ApproximateNumberOfMessages
+      Namespace: AWS/SQS
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 100
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt NewsProcessingQueue.QueueName
+      AlarmActions:
+        - !Ref NotificationsTopic
+  
+  ClassificationQueueAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${Environment}-jota-classification-queue-alarm'
+      AlarmDescription: 'Alarm for classification queue depth'
+      MetricName: ApproximateNumberOfMessages
+      Namespace: AWS/SQS
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 50
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt ClassificationQueue.QueueName
+      AlarmActions:
+        - !Ref NotificationsTopic
+  
+  # ElastiCache Redis for Caching
+  RedisSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: 'Subnet group for Redis cache'
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+  
+  RedisSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Security group for Redis cache'
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          SourceSecurityGroupId: !Ref LambdaSecurityGroup
+          Description: 'Redis access from Lambda'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-redis-sg'
+  
+  RedisCluster:
+    Type: AWS::ElastiCache::ReplicationGroup
+    Properties:
+      ReplicationGroupId: !Sub '${Environment}-jota-news-redis'
+      Description: 'Redis cluster for JOTA News caching'
+      NodeType: cache.t3.micro
+      Engine: redis
+      EngineVersion: '7.0'
+      NumCacheClusters: 2
+      Port: 6379
+      SubnetGroupName: !Ref RedisSubnetGroup
+      SecurityGroupIds:
+        - !Ref RedisSecurityGroup
+      MultiAZEnabled: true
+      AutomaticFailoverEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-jota-news-redis'
+
+Outputs:
+  VPCId:
+    Description: 'VPC ID'
+    Value: !Ref VPC
+    Export:
+      Name: !Sub '${Environment}-jota-news-vpc-id'
+  
+  DatabaseClusterEndpoint:
+    Description: 'Database cluster endpoint'
+    Value: !GetAtt DatabaseCluster.Endpoint.Address
+    Export:
+      Name: !Sub '${Environment}-jota-news-db-endpoint'
+  
+  DatabaseClusterArn:
+    Description: 'Database cluster ARN'
+    Value: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}'
+    Export:
+      Name: !Sub '${Environment}-jota-news-db-arn'
+  
+  DatabaseSecretArn:
+    Description: 'Database secret ARN'
+    Value: !Ref DatabaseSecret
+    Export:
+      Name: !Sub '${Environment}-jota-news-db-secret-arn'
+  
+  NewsProcessingQueueUrl:
+    Description: 'News processing queue URL'
+    Value: !Ref NewsProcessingQueue
+    Export:
+      Name: !Sub '${Environment}-jota-news-processing-queue-url'
+  
+  ClassificationQueueUrl:
+    Description: 'Classification queue URL'
+    Value: !Ref ClassificationQueue
+    Export:
+      Name: !Sub '${Environment}-jota-classification-queue-url'
+  
+  NotificationsTopicArn:
+    Description: 'Notifications topic ARN'
+    Value: !Ref NotificationsTopic
+    Export:
+      Name: !Sub '${Environment}-jota-notifications-topic-arn'
+  
+  UrgentNewsTopicArn:
+    Description: 'Urgent news topic ARN'
+    Value: !Ref UrgentNewsTopic
+    Export:
+      Name: !Sub '${Environment}-jota-urgent-news-topic-arn'
+  
+  RedisClusterEndpoint:
+    Description: 'Redis cluster endpoint'
+    Value: !GetAtt RedisCluster.PrimaryEndPoint.Address
+    Export:
+      Name: !Sub '${Environment}-jota-news-redis-endpoint'

@@ -1,0 +1,458 @@
+name: JOTA News System CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: jota-news-api
+
+jobs:
+  # Code Quality and Security Checks
+  quality-checks:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r services/api/requirements.txt
+        pip install bandit safety flake8 black isort
+        
+    - name: Code formatting check (Black)
+      run: black --check services/api/
+      
+    - name: Import sorting check (isort)
+      run: isort --check-only services/api/
+      
+    - name: Linting (flake8)
+      run: flake8 services/api/ --max-line-length=88 --extend-ignore=E203,W503
+      
+    - name: Security check (Bandit)
+      run: bandit -r services/api/ -f json -o bandit-report.json
+      continue-on-error: true
+      
+    - name: Dependency security check (Safety)
+      run: safety check --json --output safety-report.json
+      continue-on-error: true
+      
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+
+  # Unit and Integration Tests
+  test:
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: jota_news_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r services/api/requirements.txt
+        pip install coverage pytest-cov
+        
+    - name: Setup NLTK data
+      run: |
+        cd services/api
+        python manage.py setup_nltk
+        
+    - name: Run migrations
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jota_news_test
+        REDIS_URL: redis://localhost:6379/0
+      run: |
+        cd services/api
+        python manage.py migrate
+        
+    - name: Run tests with coverage
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jota_news_test
+        REDIS_URL: redis://localhost:6379/0
+        CELERY_BROKER_URL: redis://localhost:6379/0
+        CELERY_RESULT_BACKEND: redis://localhost:6379/0
+      run: |
+        cd services/api
+        coverage run --source='.' manage.py test
+        coverage xml
+        coverage html
+        
+    - name: Upload test coverage
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: services/api/htmlcov/
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./services/api/coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # Build and Test Docker Images
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+          
+    - name: Build API image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./services/api
+        platforms: linux/amd64,linux/arm64
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+        tags: |
+          ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
+          ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        outputs: type=docker,dest=/tmp/api-image.tar
+        
+    - name: Upload API image artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: api-image
+        path: /tmp/api-image.tar
+        
+    - name: Move cache
+      run: |
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+  # Integration Tests with Docker Compose
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download API image
+      uses: actions/download-artifact@v3
+      with:
+        name: api-image
+        path: /tmp
+        
+    - name: Load Docker image
+      run: docker load --input /tmp/api-image.tar
+      
+    - name: Create test environment file
+      run: |
+        cat > .env.test << EOF
+        DATABASE_URL=postgresql://postgres:postgres@db:5432/jota_news
+        REDIS_URL=redis://redis:6379/0
+        CELERY_BROKER_URL=redis://redis:6379/0
+        CELERY_RESULT_BACKEND=redis://redis:6379/0
+        DJANGO_SETTINGS_MODULE=jota_news.test_settings
+        EOF
+        
+    - name: Start services
+      run: |
+        docker-compose -f docker-compose.yml up -d db redis
+        sleep 10
+        
+    - name: Run integration tests
+      run: |
+        docker-compose -f docker-compose.yml run --rm \
+          -e DATABASE_URL=postgresql://postgres:postgres@db:5432/jota_news \
+          -e REDIS_URL=redis://redis:6379/0 \
+          api python manage.py test tests.integration
+          
+    - name: Test API endpoints
+      run: |
+        docker-compose -f docker-compose.yml up -d api
+        sleep 30
+        
+        # Health check
+        curl -f http://localhost:8000/health/ || exit 1
+        
+        # API documentation
+        curl -f http://localhost:8000/api/v1/ || exit 1
+        
+    - name: Cleanup
+      if: always()
+      run: docker-compose down -v
+
+  # Security Scanning
+  security:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download API image
+      uses: actions/download-artifact@v3
+      with:
+        name: api-image
+        path: /tmp
+        
+    - name: Load Docker image
+      run: docker load --input /tmp/api-image.tar
+      
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: '${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.sha }}'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Performance Testing
+  performance:
+    runs-on: ubuntu-latest
+    needs: integration-test
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js for k6
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install k6
+      run: |
+        sudo gpg -k
+        sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+        echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo apt-get update
+        sudo apt-get install k6
+        
+    - name: Create performance test script
+      run: |
+        cat > performance-test.js << 'EOF'
+        import http from 'k6/http';
+        import { check, sleep } from 'k6';
+        
+        export let options = {
+          stages: [
+            { duration: '2m', target: 10 },
+            { duration: '5m', target: 10 },
+            { duration: '2m', target: 0 },
+          ],
+        };
+        
+        export default function() {
+          // Health check
+          let response = http.get('http://localhost:8000/health/');
+          check(response, {
+            'health check status is 200': (r) => r.status === 200,
+            'health check response time < 500ms': (r) => r.timings.duration < 500,
+          });
+          
+          // API endpoints
+          response = http.get('http://localhost:8000/api/v1/news/articles/');
+          check(response, {
+            'news API status is 200': (r) => r.status === 200,
+            'news API response time < 1000ms': (r) => r.timings.duration < 1000,
+          });
+          
+          sleep(1);
+        }
+        EOF
+        
+    - name: Start services for performance test
+      run: |
+        docker-compose up -d
+        sleep 60
+        
+    - name: Run performance tests
+      run: k6 run performance-test.js
+      
+    - name: Cleanup
+      if: always()
+      run: docker-compose down -v
+
+  # Deploy to Staging
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: [integration-test, security]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+        
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+      
+    - name: Build and push to ECR
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:staging ./services/api
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:staging
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: jota-news-api
+        
+    - name: Deploy to ECS Staging
+      run: |
+        aws ecs update-service \
+          --cluster jota-news-staging \
+          --service jota-news-api-staging \
+          --force-new-deployment
+
+  # Deploy to Production
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [integration-test, security, performance]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+        
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+      
+    - name: Build and push to ECR
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA ./services/api
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./services/api
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: jota-news-api
+        
+    - name: Deploy to ECS Production
+      run: |
+        aws ecs update-service \
+          --cluster jota-news-production \
+          --service jota-news-api-production \
+          --force-new-deployment
+          
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        body: |
+          Automated release from main branch
+          Commit: ${{ github.sha }}
+        draft: false
+        prerelease: false
+
+  # Notifications
+  notify:
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always()
+    
+    steps:
+    - name: Notify Slack on Success
+      if: success()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: success
+        text: "✅ JOTA News System deployment successful!"
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        
+    - name: Notify Slack on Failure
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        text: "❌ JOTA News System deployment failed!"
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

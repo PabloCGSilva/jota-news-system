@@ -1,0 +1,47 @@
+groups:
+- name: jota_news_alerts
+  rules:
+  - alert: HighRequestRate
+    expr: rate(django_http_requests_total[5m]) > 100
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High request rate detected"
+      description: "Request rate is {{ $value }} requests/sec"
+
+  - alert: DatabaseConnectionFailed
+    expr: django_db_connections_errors_total > 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Database connection failed"
+      description: "Database connection errors detected"
+
+  - alert: WebhookFailureRate
+    expr: rate(webhook_requests_total{status="failed"}[5m]) / rate(webhook_requests_total[5m]) > 0.1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High webhook failure rate"
+      description: "Webhook failure rate is {{ $value | humanizePercentage }}"
+
+  - alert: CeleryTaskFailures
+    expr: rate(celery_task_failures_total[5m]) > 5
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High Celery task failure rate"
+      description: "Celery task failure rate is {{ $value }} failures/sec"
+
+  - alert: APIResponseTime
+    expr: histogram_quantile(0.95, rate(django_http_request_duration_seconds_bucket[5m])) > 2
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High API response time"
+      description: "95th percentile response time is {{ $value }}s"

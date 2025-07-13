@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-shadow { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .btn-primary { @apply bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors; }
+        .btn-success { @apply bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors; }
+        .btn-warning { @apply bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition-colors; }
+        .btn-danger { @apply bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen" x-data="demoApp()">
+    
+    <!-- Header -->
+    <div class="gradient-bg text-white">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-newspaper text-3xl"></i>
+                    <div>
+                        <h1 class="text-3xl font-bold">JOTA News System</h1>
+                        <p class="text-blue-100">Demo Dashboard & Testing Interface</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm">
+                        <span x-text="new Date().toLocaleString()"></span>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-2">
+                        <div class="w-3 h-3 bg-green-400 rounded-full" x-show="systemStatus === 'healthy'"></div>
+                        <div class="w-3 h-3 bg-yellow-400 rounded-full" x-show="systemStatus === 'degraded'"></div>
+                        <div class="w-3 h-3 bg-red-400 rounded-full" x-show="systemStatus === 'unhealthy'"></div>
+                        <span class="text-sm" x-text="systemStatus"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        
+        <!-- System Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">News Articles</p>
+                        <p class="text-2xl font-bold text-blue-600">{{ system_stats.news_articles|default:0 }}</p>
+                    </div>
+                    <i class="fas fa-newspaper text-blue-500 text-2xl"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Categories</p>
+                        <p class="text-2xl font-bold text-green-600">{{ system_stats.categories|default:0 }}</p>
+                    </div>
+                    <i class="fas fa-tags text-green-500 text-2xl"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Webhook Logs</p>
+                        <p class="text-2xl font-bold text-purple-600">{{ system_stats.webhook_logs|default:0 }}</p>
+                    </div>
+                    <i class="fas fa-link text-purple-500 text-2xl"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Notifications</p>
+                        <p class="text-2xl font-bold text-orange-600">{{ system_stats.notifications|default:0 }}</p>
+                    </div>
+                    <i class="fas fa-bell text-orange-500 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Actions -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">
+                    <i class="fas fa-play-circle text-blue-500 mr-2"></i>
+                    Quick Demo Actions
+                </h2>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold">Create Sample News</h3>
+                            <p class="text-sm text-gray-600">Generate sample news articles for testing</p>
+                        </div>
+                        <button @click="runAction('create_sample_news')" 
+                                :disabled="loading" 
+                                class="btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Create
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold">Test Classification</h3>
+                            <p class="text-sm text-gray-600">Run AI classification on existing news</p>
+                        </div>
+                        <button @click="runAction('test_classification')" 
+                                :disabled="loading" 
+                                class="btn-success">
+                            <i class="fas fa-brain mr-2"></i>Classify
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold">Test Webhook</h3>
+                            <p class="text-sm text-gray-600">Simulate webhook processing</p>
+                        </div>
+                        <button @click="showWebhookModal = true" 
+                                :disabled="loading" 
+                                class="btn-warning">
+                            <i class="fas fa-link mr-2"></i>Test
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold">Generate Load</h3>
+                            <p class="text-sm text-gray-600">Create test data for performance testing</p>
+                        </div>
+                        <button @click="runAction('generate_load')" 
+                                :disabled="loading" 
+                                class="btn-danger">
+                            <i class="fas fa-tachometer-alt mr-2"></i>Load
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Testing -->
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">
+                    <i class="fas fa-vial text-green-500 mr-2"></i>
+                    System Testing
+                </h2>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold">Health Checks</h3>
+                            <p class="text-sm text-gray-600">Verify all system components</p>
+                        </div>
+                        <button @click="runAction('check_health')" 
+                                :disabled="loading" 
+                                class="btn-primary">
+                            <i class="fas fa-heartbeat mr-2"></i>Check
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold">Run Tests</h3>
+                            <p class="text-sm text-gray-600">Execute demo test suite</p>
+                        </div>
+                        <button @click="runAction('run_tests')" 
+                                :disabled="loading" 
+                                class="btn-success">
+                            <i class="fas fa-check-circle mr-2"></i>Test
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold">View Logs</h3>
+                            <p class="text-sm text-gray-600">Check system logs and events</p>
+                        </div>
+                        <button @click="toggleLogs()" 
+                                class="btn-warning">
+                            <i class="fas fa-file-alt mr-2"></i>Logs
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold">Refresh Stats</h3>
+                            <p class="text-sm text-gray-600">Update system statistics</p>
+                        </div>
+                        <button @click="refreshStats()" 
+                                :disabled="loading" 
+                                class="btn-primary">
+                            <i class="fas fa-sync-alt mr-2"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Endpoints -->
+        <div class="bg-white rounded-lg card-shadow p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">
+                <i class="fas fa-link text-blue-500 mr-2"></i>
+                API Endpoints
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for endpoint in endpoints %}
+                <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <h3 class="font-semibold text-blue-600">{{ endpoint.name }}</h3>
+                    <p class="text-sm text-gray-600 mb-2">{{ endpoint.description }}</p>
+                    <a href="{{ endpoint.url }}" target="_blank" 
+                       class="text-xs text-blue-500 hover:underline">
+                        {{ endpoint.url }}
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Grafana Dashboards -->
+        <div class="bg-white rounded-lg card-shadow p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">
+                <i class="fas fa-chart-bar text-green-500 mr-2"></i>
+                Monitoring Dashboards
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for dashboard in dashboards %}
+                <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <h3 class="font-semibold text-green-600">{{ dashboard.title }}</h3>
+                    <div class="flex flex-wrap gap-1 mb-2">
+                        {% for tag in dashboard.tags %}
+                        <span class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    <a href="{{ dashboard.url }}" target="_blank" 
+                       class="text-xs text-green-500 hover:underline">
+                        Open Dashboard
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="bg-white rounded-lg card-shadow p-6" x-show="showLogs">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">
+                <i class="fas fa-terminal text-purple-500 mr-2"></i>
+                Activity Log
+            </h2>
+            
+            <div class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm max-h-96 overflow-y-auto">
+                <template x-for="log in activityLogs" :key="log.id">
+                    <div class="mb-1">
+                        <span class="text-gray-500" x-text="log.timestamp"></span>
+                        <span class="ml-2" x-text="log.message"></span>
+                    </div>
+                </template>
+                <div x-show="activityLogs.length === 0" class="text-gray-500">
+                    No activity logs yet. Run some demo actions to see logs here.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Webhook Test Modal -->
+    <div x-show="showWebhookModal" 
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-bold mb-4">Test Webhook Processing</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <input type="text" 
+                           x-model="webhookData.title" 
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="News title">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                    <textarea x-model="webhookData.content" 
+                              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              rows="3" 
+                              placeholder="News content"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Source</label>
+                        <input type="text" 
+                               x-model="webhookData.source" 
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="News source">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Author</label>
+                        <input type="text" 
+                               x-model="webhookData.author" 
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Author name">
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-2 pt-4">
+                    <button @click="showWebhookModal = false" 
+                            class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button @click="runWebhookTest()" 
+                            :disabled="loading"
+                            class="btn-primary">
+                        <i class="fas fa-paper-plane mr-2"></i>Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div x-show="loading" 
+         class="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-40">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-4">
+            <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
+            <span class="text-gray-700">Processing...</span>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div x-show="notification.show" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform translate-y-2"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform translate-y-2"
+         class="fixed top-4 right-4 z-50">
+        <div :class="notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'"
+             class="text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3">
+            <i :class="notification.type === 'success' ? 'fas fa-check' : 'fas fa-exclamation-triangle'"></i>
+            <span x-text="notification.message"></span>
+            <button @click="notification.show = false" class="ml-4">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function demoApp() {
+            return {
+                loading: false,
+                showLogs: false,
+                showWebhookModal: false,
+                systemStatus: 'checking',
+                activityLogs: [],
+                notification: {
+                    show: false,
+                    message: '',
+                    type: 'success'
+                },
+                webhookData: {
+                    title: 'Demo Webhook Article',
+                    content: 'This is a test article created via webhook processing demo.',
+                    source: 'Demo Webhook',
+                    author: 'Demo User'
+                },
+
+                init() {
+                    this.checkSystemStatus();
+                    setInterval(() => {
+                        this.checkSystemStatus();
+                    }, 30000); // Check every 30 seconds
+                },
+
+                async checkSystemStatus() {
+                    try {
+                        const response = await fetch('/demo/api/status/');
+                        if (response.ok) {
+                            const data = await response.json();
+                            const healthyCount = Object.values(data.health_checks).filter(
+                                check => check.status === 'healthy'
+                            ).length;
+                            const totalChecks = Object.keys(data.health_checks).length;
+                            
+                            if (healthyCount === totalChecks) {
+                                this.systemStatus = 'healthy';
+                            } else if (healthyCount > totalChecks / 2) {
+                                this.systemStatus = 'degraded';
+                            } else {
+                                this.systemStatus = 'unhealthy';
+                            }
+                        }
+                    } catch (error) {
+                        this.systemStatus = 'unhealthy';
+                    }
+                },
+
+                async runAction(action) {
+                    this.loading = true;
+                    this.addLog(`Starting action: ${action}`);
+                    
+                    try {
+                        const response = await fetch('/demo/action/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': this.getCSRFToken()
+                            },
+                            body: JSON.stringify({ action })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.showNotification(data.message, 'success');
+                            this.addLog(`✓ ${action} completed: ${data.message}`);
+                        } else {
+                            this.showNotification(data.error, 'error');
+                            this.addLog(`✗ ${action} failed: ${data.error}`);
+                        }
+                    } catch (error) {
+                        this.showNotification(`Action failed: ${error.message}`, 'error');
+                        this.addLog(`✗ ${action} error: ${error.message}`);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async runWebhookTest() {
+                    this.showWebhookModal = false;
+                    this.loading = true;
+                    this.addLog('Starting webhook test...');
+                    
+                    try {
+                        const response = await fetch('/demo/action/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': this.getCSRFToken()
+                            },
+                            body: JSON.stringify({ 
+                                action: 'test_webhook',
+                                webhook_data: this.webhookData
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.showNotification(data.message, 'success');
+                            this.addLog(`✓ Webhook test completed: ${data.message}`);
+                        } else {
+                            this.showNotification(data.error, 'error');
+                            this.addLog(`✗ Webhook test failed: ${data.error}`);
+                        }
+                    } catch (error) {
+                        this.showNotification(`Webhook test failed: ${error.message}`, 'error');
+                        this.addLog(`✗ Webhook test error: ${error.message}`);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                refreshStats() {
+                    this.addLog('Refreshing system statistics...');
+                    window.location.reload();
+                },
+
+                toggleLogs() {
+                    this.showLogs = !this.showLogs;
+                    if (this.showLogs && this.activityLogs.length === 0) {
+                        this.addLog('Activity log started');
+                    }
+                },
+
+                addLog(message) {
+                    this.activityLogs.unshift({
+                        id: Date.now(),
+                        timestamp: new Date().toLocaleTimeString(),
+                        message: message
+                    });
+                    
+                    // Keep only last 50 logs
+                    if (this.activityLogs.length > 50) {
+                        this.activityLogs = this.activityLogs.slice(0, 50);
+                    }
+                },
+
+                showNotification(message, type = 'success') {
+                    this.notification = {
+                        show: true,
+                        message: message,
+                        type: type
+                    };
+                    
+                    setTimeout(() => {
+                        this.notification.show = false;
+                    }, 5000);
+                },
+
+                getCSRFToken() {
+                    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

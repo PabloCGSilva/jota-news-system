@@ -1,0 +1,15 @@
+time="2025-07-10T19:27:10-03:00" level=warning msg="/mnt/c/Users/pablo/JOTA/jota-news-system/docker-compose.yml: `version` is obsolete"
+============================= test session starts ==============================
+platform linux -- Python 3.11.13, pytest-7.4.3, pluggy-1.6.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+django: version: 4.2.7
+rootdir: /app
+configfile: pytest.ini
+plugins: Faker-37.4.0, cov-4.1.0, django-4.7.0, anyio-4.9.0
+collecting ... collected 3 items
+
+test_simple.py::test_django_setup PASSED                                 [ 33%]
+test_simple.py::test_category_model PASSED                               [ 66%]
+test_simple.py::test_database_connection PASSED                          [100%]
+
+============================== 3 passed in 0.82s ===============================

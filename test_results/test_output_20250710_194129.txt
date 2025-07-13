@@ -1,0 +1,227 @@
+time="2025-07-10T19:41:29-03:00" level=warning msg="/mnt/c/Users/pablo/JOTA/jota-news-system/docker-compose.yml: `version` is obsolete"
+============================= test session starts ==============================
+platform linux -- Python 3.11.13, pytest-7.4.3, pluggy-1.6.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+django: version: 4.2.7
+rootdir: /app
+configfile: pytest.ini
+plugins: Faker-37.4.0, cov-4.1.0, django-4.7.0, anyio-4.9.0
+collecting ... collected 138 items
+
+tests/test_authentication.py::TestUserModel::test_user_creation PASSED   [  0%]
+tests/test_authentication.py::TestUserModel::test_superuser_creation PASSED [  1%]
+tests/test_authentication.py::TestUserModel::test_user_profile_creation PASSED [  2%]
+tests/test_authentication.py::TestAPIKeyModel::test_api_key_creation PASSED [  2%]
+tests/test_authentication.py::TestAPIKeyModel::test_api_key_str PASSED   [  3%]
+tests/test_authentication.py::TestAuthenticationAPI::test_token_obtain PASSED [  4%]
+tests/test_authentication.py::TestAuthenticationAPI::test_token_obtain_invalid_credentials PASSED [  5%]
+tests/test_authentication.py::TestAuthenticationAPI::test_token_refresh PASSED [  5%]
+tests/test_authentication.py::TestAuthenticationAPI::test_user_registration PASSED [  6%]
+tests/test_authentication.py::TestAuthenticationAPI::test_user_profile_get PASSED [  7%]
+tests/test_authentication.py::TestAuthenticationAPI::test_user_profile_update PASSED [  7%]
+tests/test_authentication.py::TestAuthenticationAPI::test_unauthenticated_access PASSED [  8%]
+tests/test_authentication.py::TestAPIKeyAuthentication::test_api_key_authentication PASSED [  9%]
+tests/test_authentication.py::TestAPIKeyAuthentication::test_invalid_api_key PASSED [ 10%]
+tests/test_authentication.py::TestAPIKeyAuthentication::test_inactive_api_key PASSED [ 10%]
+tests/test_authentication_fixed.py::TestUserModel::test_user_creation PASSED [ 11%]
+tests/test_authentication_fixed.py::TestUserModel::test_superuser_creation FAILED [ 12%]
+tests/test_authentication_fixed.py::TestUserModel::test_user_profile_creation PASSED [ 13%]
+tests/test_authentication_fixed.py::TestAPIKeyModel::test_api_key_creation PASSED [ 13%]
+tests/test_authentication_fixed.py::TestAPIKeyModel::test_api_key_str PASSED [ 14%]
+tests/test_authentication_fixed.py::TestAuthenticationAPI::test_token_obtain PASSED [ 15%]
+tests/test_authentication_fixed.py::TestAuthenticationAPI::test_token_obtain_invalid_credentials PASSED [ 15%]
+tests/test_authentication_fixed.py::TestAuthenticationAPI::test_token_refresh PASSED [ 16%]
+tests/test_authentication_fixed.py::TestAuthenticationAPI::test_user_registration FAILED [ 17%]
+tests/test_authentication_fixed.py::TestAuthenticationAPI::test_user_profile_get PASSED [ 18%]
+tests/test_authentication_fixed.py::TestAuthenticationAPI::test_user_profile_update PASSED [ 18%]
+tests/test_authentication_fixed.py::TestAuthenticationAPI::test_unauthenticated_access PASSED [ 19%]
+tests/test_authentication_fixed.py::TestAPIKeyAuthentication::test_api_key_authentication PASSED [ 20%]
+tests/test_authentication_fixed.py::TestAPIKeyAuthentication::test_invalid_api_key PASSED [ 21%]
+tests/test_authentication_fixed.py::TestAPIKeyAuthentication::test_inactive_api_key PASSED [ 21%]
+tests/test_news.py::TestNewsModel::test_news_creation PASSED             [ 22%]
+tests/test_news.py::TestNewsModel::test_news_word_count_calculation PASSED [ 23%]
+tests/test_news.py::TestNewsModel::test_news_reading_time_calculation PASSED [ 23%]
+tests/test_news.py::TestCategoryModel::test_category_creation PASSED     [ 24%]
+tests/test_news.py::TestCategoryModel::test_category_subcategories PASSED [ 25%]
+tests/test_news.py::TestNewsAPI::test_news_list_public FAILED            [ 26%]
+tests/test_news.py::TestNewsAPI::test_news_detail_public FAILED          [ 26%]
+tests/test_news.py::TestNewsAPI::test_news_create_authenticated FAILED   [ 27%]
+
+=================================== FAILURES ===================================
+____________________ TestUserModel.test_superuser_creation _____________________
+/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py:89: in _execute
+    return self.cursor.execute(sql, params)
+E   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "auth_user_username_key"
+E   DETAIL:  Key (username)=(admin) already exists.
+
+The above exception was the direct cause of the following exception:
+tests/test_authentication_fixed.py:32: in test_superuser_creation
+    admin = User.objects.create_superuser(
+/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py:172: in create_superuser
+    return self._create_user(username, email, password, **extra_fields)
+/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py:155: in _create_user
+    user.save(using=self._db)
+/usr/local/lib/python3.11/site-packages/django/contrib/auth/base_user.py:76: in save
+    super().save(*args, **kwargs)
+/usr/local/lib/python3.11/site-packages/django/db/models/base.py:814: in save
+    self.save_base(
+/usr/local/lib/python3.11/site-packages/django/db/models/base.py:877: in save_base
+    updated = self._save_table(
+/usr/local/lib/python3.11/site-packages/django/db/models/base.py:1020: in _save_table
+    results = self._do_insert(
+/usr/local/lib/python3.11/site-packages/django/db/models/base.py:1061: in _do_insert
+    return manager._insert(
+/usr/local/lib/python3.11/site-packages/django/db/models/manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+/usr/local/lib/python3.11/site-packages/django/db/models/query.py:1805: in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+/usr/local/lib/python3.11/site-packages/django/db/models/sql/compiler.py:1822: in execute_sql
+    cursor.execute(sql, params)
+/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py:67: in execute
+    return self._execute_with_wrappers(
+/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py:80: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py:84: in _execute
+    with self.db.wrap_database_errors:
+/usr/local/lib/python3.11/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py:89: in _execute
+    return self.cursor.execute(sql, params)
+E   django.db.utils.IntegrityError: duplicate key value violates unique constraint "auth_user_username_key"
+E   DETAIL:  Key (username)=(admin) already exists.
+_________________ TestAuthenticationAPI.test_user_registration _________________
+tests/test_authentication_fixed.py:139: in test_user_registration
+    assert response.status_code == status.HTTP_201_CREATED
+E   assert 400 == 201
+E    +  where 400 = <Response status_code=400, "application/json">.status_code
+E    +  and   201 = status.HTTP_201_CREATED
+----------------------------- Captured stderr call -----------------------------
+INFO Request started - POST /api/v1/auth/register/
+INFO Request completed - POST /api/v1/auth/register/ - 400
+WARNING Bad Request: /api/v1/auth/register/
+______________________ TestNewsAPI.test_news_list_public _______________________
+tests/test_news.py:93: in test_news_list_public
+    url = reverse('news:article-list')
+/usr/local/lib/python3.11/site-packages/django/urls/base.py:88: in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+/usr/local/lib/python3.11/site-packages/django/urls/resolvers.py:828: in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+E   django.urls.exceptions.NoReverseMatch: Reverse for 'article-list' not found. 'article-list' is not a valid view function or pattern name.
+_____________________ TestNewsAPI.test_news_detail_public ______________________
+tests/test_news.py:101: in test_news_detail_public
+    url = reverse('news:article-detail', kwargs={'pk': news_article.id})
+/usr/local/lib/python3.11/site-packages/django/urls/base.py:88: in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+/usr/local/lib/python3.11/site-packages/django/urls/resolvers.py:828: in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+E   django.urls.exceptions.NoReverseMatch: Reverse for 'article-detail' not found. 'article-detail' is not a valid view function or pattern name.
+__________________ TestNewsAPI.test_news_create_authenticated __________________
+tests/test_news.py:108: in test_news_create_authenticated
+    url = reverse('news:article-list')
+/usr/local/lib/python3.11/site-packages/django/urls/base.py:88: in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+/usr/local/lib/python3.11/site-packages/django/urls/resolvers.py:828: in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+E   django.urls.exceptions.NoReverseMatch: Reverse for 'article-list' not found. 'article-list' is not a valid view function or pattern name.
+=============================== warnings summary ===============================
+tests/integration/test_news_api.py:9
+  /app/tests/integration/test_news_api.py:9: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests/integration/test_news_api.py:151
+  /app/tests/integration/test_news_api.py:151: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests/integration/test_news_api.py:195
+  /app/tests/integration/test_news_api.py:195: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests/integration/test_news_api.py:222
+  /app/tests/integration/test_news_api.py:222: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests/integration/test_webhook_integration.py:14
+  /app/tests/integration/test_webhook_integration.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests/integration/test_webhook_integration.py:72
+  /app/tests/integration/test_webhook_integration.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests/integration/test_webhook_integration.py:167
+  /app/tests/integration/test_webhook_integration.py:167: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests/integration/test_webhook_integration.py:238
+  /app/tests/integration/test_webhook_integration.py:238: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests/integration/test_webhook_integration.py:258
+  /app/tests/integration/test_webhook_integration.py:258: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests/unit/test_classification_models.py:14
+  /app/tests/unit/test_classification_models.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_classification_models.py:80
+  /app/tests/unit/test_classification_models.py:80: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_classification_models.py:119
+  /app/tests/unit/test_classification_models.py:119: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_classification_models.py:172
+  /app/tests/unit/test_classification_models.py:172: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_classification_models.py:196
+  /app/tests/unit/test_classification_models.py:196: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_news_models.py:13
+  /app/tests/unit/test_news_models.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_news_models.py:49
+  /app/tests/unit/test_news_models.py:49: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_news_models.py:84
+  /app/tests/unit/test_news_models.py:84: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_news_models.py:110
+  /app/tests/unit/test_news_models.py:110: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_news_models.py:209
+  /app/tests/unit/test_news_models.py:209: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_news_serializers.py:15
+  /app/tests/unit/test_news_serializers.py:15: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_news_serializers.py:50
+  /app/tests/unit/test_news_serializers.py:50: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_news_serializers.py:65
+  /app/tests/unit/test_news_serializers.py:65: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests/unit/test_news_serializers.py:79
+  /app/tests/unit/test_news_serializers.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_authentication_fixed.py::TestUserModel::test_superuser_creation
+FAILED tests/test_authentication_fixed.py::TestAuthenticationAPI::test_user_registration
+FAILED tests/test_news.py::TestNewsAPI::test_news_list_public - django.urls.e...
+FAILED tests/test_news.py::TestNewsAPI::test_news_detail_public - django.urls...
+FAILED tests/test_news.py::TestNewsAPI::test_news_create_authenticated - djan...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 5 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+================== 5 failed, 33 passed, 23 warnings in 10.89s ==================

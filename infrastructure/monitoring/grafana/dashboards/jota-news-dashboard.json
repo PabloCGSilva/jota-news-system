@@ -1,0 +1,83 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "JOTA News System Dashboard",
+    "tags": ["jota", "news", "system"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Overview",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"jota-news-api\"}",
+            "legendFormat": "API Status"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(django_http_requests_total[5m])",
+            "legendFormat": "Requests/sec"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "News Articles",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "django_model_inserts_total{model=\"news.News\"}",
+            "legendFormat": "Total Articles"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "id": 4,
+        "title": "Webhook Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(webhook_requests_total{status=\"success\"}[5m]) / rate(webhook_requests_total[5m]) * 100",
+            "legendFormat": "Success Rate %"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        }
+      }
+    ],
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "refresh": "5s"
+  }
+}

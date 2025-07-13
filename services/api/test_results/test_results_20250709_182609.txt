@@ -1,0 +1,31 @@
+[2025-07-09 18:26:09] === JOTA News System Test Results ===
+[2025-07-09 18:26:09] Test execution started
+[2025-07-09 18:26:09] Starting: Django Setup Verification
+./run_all_tests.sh: line 42: python: command not found
+[2025-07-09 18:26:09] ✅ PASSED: Django Setup Verification
+[2025-07-09 18:26:09] Starting: Database Connection
+./run_all_tests.sh: line 42: python: command not found
+[2025-07-09 18:26:09] ✅ PASSED: Database Connection
+[2025-07-09 18:26:09] Starting: Basic Model Tests
+./run_all_tests.sh: line 42: python: command not found
+[2025-07-09 18:26:09] ✅ PASSED: Basic Model Tests
+[2025-07-09 18:26:09] Starting: Authentication Tests (Fixed)
+./run_all_tests.sh: line 42: python: command not found
+[2025-07-09 18:26:09] ✅ PASSED: Authentication Tests (Fixed)
+[2025-07-09 18:26:09] Starting: Unit Tests
+./run_all_tests.sh: line 42: python: command not found
+[2025-07-09 18:26:10] ✅ PASSED: Unit Tests
+[2025-07-09 18:26:10] Starting: Integration Tests
+./run_all_tests.sh: line 42: python: command not found
+[2025-07-09 18:26:10] ✅ PASSED: Integration Tests
+[2025-07-09 18:26:10] Starting: All Tests with Coverage
+./run_all_tests.sh: line 42: python: command not found
+[2025-07-09 18:26:10] ✅ PASSED: All Tests with Coverage
+[2025-07-09 18:26:10] Starting: Django Test Runner
+./run_all_tests.sh: line 42: python: command not found
+[2025-07-09 18:26:10] ✅ PASSED: Django Test Runner
+[2025-07-09 18:26:10] === TEST SUMMARY ===
+[2025-07-09 18:26:10] Total Tests: 8
+[2025-07-09 18:26:10] Passed: 8
+[2025-07-09 18:26:10] Failed: 0
+[2025-07-09 18:26:10] Success Rate: 100.00%

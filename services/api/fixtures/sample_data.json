@@ -1,0 +1,258 @@
+[
+  {
+    "model": "news.category",
+    "pk": "11111111-1111-1111-1111-111111111111",
+    "fields": {
+      "name": "Poder",
+      "slug": "poder",
+      "description": "Notícias sobre governo, política e poder público",
+      "keywords": ["governo", "política", "congresso", "executivo", "legislativo", "judiciário", "eleições"],
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.category",
+    "pk": "22222222-2222-2222-2222-222222222222",
+    "fields": {
+      "name": "Tributos",
+      "slug": "tributos",
+      "description": "Notícias sobre impostos, tributação e receita federal",
+      "keywords": ["impostos", "receita federal", "tributação", "reforma tributária", "fisco"],
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.category",
+    "pk": "33333333-3333-3333-3333-333333333333",
+    "fields": {
+      "name": "Saúde",
+      "slug": "saude",
+      "description": "Notícias sobre saúde pública e medicina",
+      "keywords": ["saúde pública", "medicina", "hospitais", "anvisa", "sus"],
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.category",
+    "pk": "44444444-4444-4444-4444-444444444444",
+    "fields": {
+      "name": "Trabalhista",
+      "slug": "trabalhista",
+      "description": "Notícias sobre trabalho, previdência e direitos trabalhistas",
+      "keywords": ["trabalho", "previdência", "emprego", "sindicatos", "clt"],
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.subcategory",
+    "pk": "aaaa1111-aaaa-1111-aaaa-111111111111",
+    "fields": {
+      "name": "Aposta da Semana",
+      "slug": "aposta-da-semana",
+      "description": "Análises e apostas semanais sobre tributos",
+      "category": "22222222-2222-2222-2222-222222222222",
+      "keywords": ["aposta", "análise", "previsão"],
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.subcategory",
+    "pk": "bbbb2222-bbbb-2222-bbbb-222222222222",
+    "fields": {
+      "name": "Matinal",
+      "slug": "matinal",
+      "description": "Notícias matinais sobre diversos assuntos",
+      "category": "11111111-1111-1111-1111-111111111111",
+      "keywords": ["matinal", "manhã", "resumo"],
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.tag",
+    "pk": "tag11111-1111-1111-1111-111111111111",
+    "fields": {
+      "name": "Reforma Tributária",
+      "slug": "reforma-tributaria",
+      "description": "Tag para notícias sobre reforma tributária",
+      "usage_count": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.tag",
+    "pk": "tag22222-2222-2222-2222-222222222222",
+    "fields": {
+      "name": "Imposto de Renda",
+      "slug": "imposto-de-renda",
+      "description": "Tag para notícias sobre imposto de renda",
+      "usage_count": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "news.tag",
+    "pk": "tag33333-3333-3333-3333-333333333333",
+    "fields": {
+      "name": "Congresso",
+      "slug": "congresso",
+      "description": "Tag para notícias sobre o Congresso Nacional",
+      "usage_count": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "webhooks.webhooksource",
+    "pk": "webhook11-1111-1111-1111-111111111111",
+    "fields": {
+      "name": "JOTA External API",
+      "description": "Webhook source for external JOTA API",
+      "endpoint_url": "https://api.jota.info/webhook",
+      "secret_key": "jota_webhook_secret_key_123",
+      "is_active": true,
+      "expected_content_type": "application/json",
+      "requires_authentication": true,
+      "rate_limit_per_minute": 100,
+      "total_requests": 0,
+      "successful_requests": 0,
+      "failed_requests": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "classification.classificationrule",
+    "pk": "rule1111-1111-1111-1111-111111111111",
+    "fields": {
+      "name": "Poder - Governo Federal",
+      "description": "Regra para classificar notícias sobre governo federal",
+      "rule_type": "keyword",
+      "target_category": "11111111-1111-1111-1111-111111111111",
+      "keywords": ["governo federal", "presidente", "planalto", "ministério", "executivo"],
+      "patterns": [],
+      "weight": 1.0,
+      "confidence_threshold": 0.6,
+      "requires_title_match": false,
+      "requires_content_match": true,
+      "case_sensitive": false,
+      "is_active": true,
+      "priority": 100,
+      "total_matches": 0,
+      "successful_classifications": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "classification.classificationrule",
+    "pk": "rule2222-2222-2222-2222-222222222222",
+    "fields": {
+      "name": "Tributos - Receita Federal",
+      "description": "Regra para classificar notícias sobre receita federal",
+      "rule_type": "keyword",
+      "target_category": "22222222-2222-2222-2222-222222222222",
+      "keywords": ["receita federal", "imposto", "tributação", "fisco", "arrecadação"],
+      "patterns": [],
+      "weight": 1.2,
+      "confidence_threshold": 0.7,
+      "requires_title_match": false,
+      "requires_content_match": true,
+      "case_sensitive": false,
+      "is_active": true,
+      "priority": 90,
+      "total_matches": 0,
+      "successful_classifications": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "notifications.notificationchannel",
+    "pk": "channel1-1111-1111-1111-111111111111",
+    "fields": {
+      "name": "WhatsApp Business",
+      "channel_type": "whatsapp",
+      "description": "Canal de notificações via WhatsApp Business API",
+      "config": {
+        "access_token": "test_whatsapp_token",
+        "phone_number_id": "test_phone_number_id"
+      },
+      "is_active": true,
+      "is_default": true,
+      "rate_limit_per_minute": 60,
+      "rate_limit_per_hour": 1000,
+      "total_sent": 0,
+      "total_delivered": 0,
+      "total_failed": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "notifications.notificationchannel",
+    "pk": "channel2-2222-2222-2222-222222222222",
+    "fields": {
+      "name": "Email Notifications",
+      "channel_type": "email",
+      "description": "Canal de notificações por email",
+      "config": {},
+      "is_active": true,
+      "is_default": false,
+      "rate_limit_per_minute": 100,
+      "rate_limit_per_hour": 2000,
+      "total_sent": 0,
+      "total_delivered": 0,
+      "total_failed": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "notifications.notificationtemplate",
+    "pk": "template1-1111-1111-1111-111111111111",
+    "fields": {
+      "name": "WhatsApp Urgent News",
+      "template_type": "urgent_news",
+      "channel": "channel1-1111-1111-1111-111111111111",
+      "subject": "🚨 URGENTE - JOTA",
+      "body_template": "🚨 *NOTÍCIA URGENTE*\n\n*{{title}}*\n\n{{summary}}\n\nFonte: {{source}}\n\n_JOTA News System_",
+      "is_active": true,
+      "is_default": true,
+      "max_length": 1000,
+      "times_used": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "notifications.notificationtemplate",
+    "pk": "template2-2222-2222-2222-222222222222",
+    "fields": {
+      "name": "Email Daily Summary",
+      "template_type": "daily_summary",
+      "channel": "channel2-2222-2222-2222-222222222222",
+      "subject": "Resumo Diário JOTA - {{date}}",
+      "body_template": "Olá {{user_name}},\n\nResumo de notícias de {{date}}:\n\n📰 {{total_news}} notícias\n🚨 {{urgent_news}} urgentes\n\nPrincipais categorias:\n{{categories}}\n\nPrincipais notícias:\n{{top_news}}\n\nAtenciosamente,\nEquipe JOTA",
+      "is_active": true,
+      "is_default": true,
+      "max_length": null,
+      "times_used": 0,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  }
+]

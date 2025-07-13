@@ -1,0 +1,98 @@
+# Multi-stage Dockerfile for production optimization
+FROM python:3.11-slim as base
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Development stage
+FROM base as development
+
+# Install development dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+RUN pip install pytest coverage bandit safety flake8 black isort
+
+# Copy source code
+COPY . .
+
+# Test stage
+FROM development as test
+
+# Run tests and generate coverage
+RUN python manage.py test --keepdb
+RUN coverage run --source='.' manage.py test
+RUN coverage report
+
+# Production build stage
+FROM base as build
+
+# Install only production dependencies
+COPY requirements.txt .
+RUN pip install --no-deps -r requirements.txt
+
+# Copy source code
+COPY . .
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Security scanning stage
+FROM build as security
+
+# Install security tools
+RUN pip install bandit safety
+
+# Run security checks
+RUN bandit -r . -f json -o bandit-report.json || true
+RUN safety check --json --output safety-report.json || true
+
+# Production stage
+FROM python:3.11-slim as production
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r django \
+    && useradd -r -g django django
+
+WORKDIR /app
+
+# Copy only production dependencies and code from build stage
+COPY --from=build /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=build /usr/local/bin /usr/local/bin
+COPY --from=build /app .
+
+# Change ownership to django user
+RUN chown -R django:django /app
+USER django
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health/ || exit 1
+
+# Expose port
+EXPOSE 8000
+
+# Default command
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "jota_news.wsgi:application"]

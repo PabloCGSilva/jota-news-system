@@ -1,0 +1,208 @@
+{
+  "timestamp": "2025-07-12T22:14:45.237551",
+  "tests": {
+    "unit": {
+      "status": "passed",
+      "output": "============================= test session starts ==============================\nplatform linux -- Python 3.11.13, pytest-7.4.3, pluggy-1.6.0 -- /usr/local/bin/python3.11\ncachedir: .pytest_cache\ndjango: version: 4.2.7\nrootdir: /app\nconfigfile: pytest.ini\nplugins: Faker-37.4.0, cov-4.1.0, django-4.7.0, anyio-4.9.0\ncollecting ... collected 37 items\n\ntests/unit/test_classification_models.py::TestClassificationRule::test_create_classification_rule PASSED [  2%]\ntests/unit/test_classification_models.py::TestClassificationRule::test_rule_increment_matches PASSED [  5%]\ntests/unit/test_classification_models.py::TestClassificationRule::test_rule_increment_successful_classifications PASSED [  8%]\ntests/unit/test_classification_models.py::TestClassificationRule::test_rule_success_rate_calculation PASSED [ 10%]\ntests/unit/test_classification_models.py::TestClassificationRule::test_rule_unique_name PASSED [ 13%]\ntests/unit/test_classification_models.py::TestClassificationModel::test_create_classification_model PASSED [ 16%]\ntests/unit/test_classification_models.py::TestClassificationModel::test_model_increment_predictions PASSED [ 18%]\ntests/unit/test_classification_models.py::TestClassificationResult::test_create_classification_result PASSED [ 21%]\ntests/unit/test_classification_models.py::TestClassificationResult::test_accept_classification PASSED [ 24%]\ntests/unit/test_classification_models.py::TestClassificationTrainingData::test_create_training_data PASSED [ 27%]\ntests/unit/test_classification_models.py::TestClassificationStatistic::test_create_classification_statistic PASSED [ 29%]\ntests/unit/test_classification_models.py::TestClassificationStatistic::test_statistic_success_rate_calculation PASSED [ 32%]\ntests/unit/test_news_models.py::TestCategoryModel::test_create_category PASSED [ 35%]\ntests/unit/test_news_models.py::TestCategoryModel::test_category_unique_name PASSED [ 37%]\ntests/unit/test_news_models.py::TestCategoryModel::test_category_unique_slug PASSED [ 40%]\ntests/unit/test_news_models.py::TestSubcategoryModel::test_create_subcategory PASSED [ 43%]\ntests/unit/test_news_models.py::TestSubcategoryModel::test_subcategory_category_slug_unique_together PASSED [ 45%]\ntests/unit/test_news_models.py::TestTagModel::test_create_tag PASSED     [ 48%]\ntests/unit/test_news_models.py::TestTagModel::test_tag_unique_name PASSED [ 51%]\ntests/unit/test_news_models.py::TestNewsModel::test_create_news PASSED   [ 54%]\ntests/unit/test_news_models.py::TestNewsModel::test_news_auto_word_count PASSED [ 56%]\ntests/unit/test_news_models.py::TestNewsModel::test_news_auto_reading_time PASSED [ 59%]\ntests/unit/test_news_models.py::TestNewsModel::test_news_auto_summary_generation PASSED [ 62%]\ntests/unit/test_news_models.py::TestNewsModel::test_news_increment_view_count PASSED [ 64%]\ntests/unit/test_news_models.py::TestNewsModel::test_news_increment_share_count PASSED [ 67%]\ntests/unit/test_news_models.py::TestNewsModel::test_news_external_id_unique PASSED [ 70%]\ntests/unit/test_news_models.py::TestNewsProcessingLog::test_create_processing_log PASSED [ 72%]\ntests/unit/test_news_serializers.py::TestCategorySerializer::test_serialize_category PASSED [ 75%]\ntests/unit/test_news_serializers.py::TestCategorySerializer::test_deserialize_category PASSED [ 78%]\ntests/unit/test_news_serializers.py::TestSubcategorySerializer::test_serialize_subcategory PASSED [ 81%]\ntests/unit/test_news_serializers.py::TestTagSerializer::test_serialize_tag PASSED [ 83%]\ntests/unit/test_news_serializers.py::TestNewsSerializers::test_news_list_serializer PASSED [ 86%]\ntests/unit/test_news_serializers.py::TestNewsSerializers::test_news_detail_serializer PASSED [ 89%]\ntests/unit/test_news_serializers.py::TestNewsSerializers::test_news_create_serializer PASSED [ 91%]\ntests/unit/test_news_serializers.py::TestNewsSerializers::test_news_update_serializer PASSED [ 94%]\ntests/unit/test_news_serializers.py::TestNewsSerializers::test_news_create_serializer_validation PASSED [ 97%]\ntests/unit/test_news_serializers.py::TestNewsSerializers::test_news_create_with_duplicate_external_id PASSED [100%]\n\n=============================== warnings summary ===============================\ntests/unit/test_classification_models.py:14\n  /app/tests/unit/test_classification_models.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_classification_models.py:80\n  /app/tests/unit/test_classification_models.py:80: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_classification_models.py:119\n  /app/tests/unit/test_classification_models.py:119: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_classification_models.py:172\n  /app/tests/unit/test_classification_models.py:172: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_classification_models.py:196\n  /app/tests/unit/test_classification_models.py:196: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_news_models.py:13\n  /app/tests/unit/test_news_models.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_news_models.py:53\n  /app/tests/unit/test_news_models.py:53: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_news_models.py:88\n  /app/tests/unit/test_news_models.py:88: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_news_models.py:114\n  /app/tests/unit/test_news_models.py:114: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_news_models.py:213\n  /app/tests/unit/test_news_models.py:213: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_news_serializers.py:15\n  /app/tests/unit/test_news_serializers.py:15: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_news_serializers.py:50\n  /app/tests/unit/test_news_serializers.py:50: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_news_serializers.py:65\n  /app/tests/unit/test_news_serializers.py:65: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_news_serializers.py:79\n  /app/tests/unit/test_news_serializers.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n\n---------- coverage: platform linux, python 3.11.13-final-0 ----------\nName                                                                           Stmts   Miss  Cover\n--------------------------------------------------------------------------------------------------\napps/__init__.py                                                                   0      0   100%\napps/authentication/__init__.py                                                    0      0   100%\napps/authentication/admin.py                                                      34      4    88%\napps/authentication/apps.py                                                       10      0   100%\napps/authentication/backends.py                                                   24     24     0%\napps/authentication/drf_authentication.py                                         38     38     0%\napps/authentication/migrations/0001_initial.py                                    11     11     0%\napps/authentication/migrations/__init__.py                                         0      0   100%\napps/authentication/models.py                                                     63      7    89%\napps/authentication/serializers.py                                                97     97     0%\napps/authentication/urls.py                                                       19     19     0%\napps/authentication/views.py                                                     104    104     0%\napps/classification/__init__.py                                                    0      0   100%\napps/classification/admin.py                                                     144     63    56%\napps/classification/apps.py                                                        7      0   100%\napps/classification/classifier.py                                                225    169    25%\napps/classification/management/__init__.py                                         0      0   100%\napps/classification/management/commands/__init__.py                                0      0   100%\napps/classification/management/commands/setup_nltk.py                             68     68     0%\napps/classification/migrations/0001_initial.py                                     8      8     0%\napps/classification/migrations/__init__.py                                         0      0   100%\napps/classification/models.py                                                    162      1    99%\napps/classification/serializers.py                                                87     87     0%\napps/classification/signals.py                                                    38      6    84%\napps/classification/tasks.py                                                     168    146    13%\napps/classification/urls.py                                                       12     12     0%\napps/classification/views.py                                                     168    168     0%\napps/demo/__init__.py                                                              0      0   100%\napps/demo/apps.py                                                                  5      0   100%\napps/demo/urls.py                                                                  4      4     0%\napps/demo/views.py                                                               170    170     0%\napps/news/__init__.py                                                              0      0   100%\napps/news/admin.py                                                                91     20    78%\napps/news/apps.py                                                                  7      0   100%\napps/news/filters.py                                                              62     62     0%\napps/news/management/__init__.py                                                   0      0   100%\napps/news/management/commands/__init__.py                                          0      0   100%\napps/news/management/commands/create_sample_data.py                               78     78     0%\napps/news/migrations/0001_initial.py                                              11     11     0%\napps/news/migrations/0002_remove_news_news_news_title_ad75b1_gin_and_more.py       5      5     0%\napps/news/migrations/0003_fix_external_id_constraint.py                            4      4     0%\napps/news/migrations/__init__.py                                                   0      0   100%\napps/news/models.py                                                              130      3    98%\napps/news/pagination.py                                                           15     15     0%\napps/news/serializers.py                                                          92      0   100%\napps/news/signals.py                                                              39      3    92%\napps/news/tasks.py                                                                93     93     0%\napps/news/urls.py                                                                 12     12     0%\napps/news/views.py                                                               149    149     0%\napps/notifications/__init__.py                                                     0      0   100%\napps/notifications/admin.py                                                      141     56    60%\napps/notifications/apps.py                                                         7      0   100%\napps/notifications/migrations/0001_initial.py                                      9      9     0%\napps/notifications/migrations/__init__.py                                          0      0   100%\napps/notifications/models.py                                                     202     64    68%\napps/notifications/providers.py                                                   97     67    31%\napps/notifications/serializers.py                                                129    129     0%\napps/notifications/signals.py                                                     37     25    32%\napps/notifications/tasks.py                                                      194    171    12%\napps/notifications/urls.py                                                        12     12     0%\napps/notifications/views.py                                                      211    211     0%\napps/webhooks/__init__.py                                                          0      0   100%\napps/webhooks/admin.py                                                           105     40    62%\napps/webhooks/apps.py                                                              7      0   100%\napps/webhooks/migrations/0001_initial.py                                           7      7     0%\napps/webhooks/migrations/__init__.py                                               0      0   100%\napps/webhooks/models.py                                                          124     30    76%\napps/webhooks/serializers.py                                                      72     72     0%\napps/webhooks/signals.py                                                          28     18    36%\napps/webhooks/tasks.py                                                           151    151     0%\napps/webhooks/urls.py                                                              9      9     0%\napps/webhooks/utils.py                                                           121    121     0%\napps/webhooks/views.py                                                           123    123     0%\n--------------------------------------------------------------------------------------------------\nTOTAL                                                                           4240   2976    30%\nCoverage JSON written to file coverage.json\n\n======================= 37 passed, 14 warnings in 10.39s =======================\n"
+    },
+    "integration": {
+      "status": "passed",
+      "output": "============================= test session starts ==============================\nplatform linux -- Python 3.11.13, pytest-7.4.3, pluggy-1.6.0 -- /usr/local/bin/python3.11\ncachedir: .pytest_cache\ndjango: version: 4.2.7\nrootdir: /app\nconfigfile: pytest.ini\nplugins: Faker-37.4.0, cov-4.1.0, django-4.7.0, anyio-4.9.0\ncollecting ... collected 29 items\n\ntests/integration/test_news_api.py::TestNewsAPI::test_list_news_authenticated PASSED [  3%]\ntests/integration/test_news_api.py::TestNewsAPI::test_list_news_unauthenticated PASSED [  6%]\ntests/integration/test_news_api.py::TestNewsAPI::test_retrieve_news PASSED [ 10%]\ntests/integration/test_news_api.py::TestNewsAPI::test_create_news PASSED [ 13%]\ntests/integration/test_news_api.py::TestNewsAPI::test_update_news PASSED [ 17%]\ntests/integration/test_news_api.py::TestNewsAPI::test_filter_news_by_category PASSED [ 20%]\ntests/integration/test_news_api.py::TestNewsAPI::test_search_news PASSED [ 24%]\ntests/integration/test_news_api.py::TestNewsAPI::test_mark_news_urgent PASSED [ 27%]\ntests/integration/test_news_api.py::TestNewsAPI::test_share_news PASSED  [ 31%]\ntests/integration/test_news_api.py::TestNewsAPI::test_get_related_news PASSED [ 34%]\ntests/integration/test_news_api.py::TestNewsAPI::test_advanced_search PASSED [ 37%]\ntests/integration/test_news_api.py::TestCategoryAPI::test_list_categories PASSED [ 41%]\ntests/integration/test_news_api.py::TestCategoryAPI::test_create_category PASSED [ 44%]\ntests/integration/test_news_api.py::TestCategoryAPI::test_category_statistics PASSED [ 48%]\ntests/integration/test_news_api.py::TestTagAPI::test_list_tags PASSED    [ 51%]\ntests/integration/test_news_api.py::TestTagAPI::test_create_tag PASSED   [ 55%]\ntests/integration/test_news_api.py::TestNewsPermissions::test_unauthenticated_read_access_allowed PASSED [ 58%]\ntests/integration/test_news_api.py::TestNewsPermissions::test_read_only_access_for_regular_users PASSED [ 62%]\ntests/integration/test_webhook_integration.py::TestWebhookEndpoints::test_webhook_source_crud PASSED [ 65%]\ntests/integration/test_webhook_integration.py::TestWebhookEndpoints::test_webhook_statistics PASSED [ 68%]\ntests/integration/test_webhook_integration.py::TestWebhookEndpoints::test_webhook_test_endpoint PASSED [ 72%]\ntests/integration/test_webhook_integration.py::TestNewsWebhookReceiver::test_receive_valid_webhook PASSED [ 75%]\ntests/integration/test_webhook_integration.py::TestNewsWebhookReceiver::test_receive_webhook_invalid_source PASSED [ 79%]\ntests/integration/test_webhook_integration.py::TestNewsWebhookReceiver::test_receive_webhook_invalid_json PASSED [ 82%]\ntests/integration/test_webhook_integration.py::TestNewsWebhookReceiver::test_receive_webhook_missing_required_fields PASSED [ 86%]\ntests/integration/test_webhook_integration.py::TestNewsWebhookReceiver::test_webhook_signature_verification PASSED [ 89%]\ntests/integration/test_webhook_integration.py::TestWebhookDashboard::test_webhook_dashboard PASSED [ 93%]\ntests/integration/test_webhook_integration.py::TestWebhookProcessing::test_webhook_processing_task_triggered PASSED [ 96%]\ntests/integration/test_webhook_integration.py::TestWebhookProcessing::test_webhook_log_creation PASSED [100%]\n\n=============================== warnings summary ===============================\ntests/integration/test_news_api.py:9\n  /app/tests/integration/test_news_api.py:9: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_news_api.py:152\n  /app/tests/integration/test_news_api.py:152: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_news_api.py:196\n  /app/tests/integration/test_news_api.py:196: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_news_api.py:223\n  /app/tests/integration/test_news_api.py:223: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_webhook_integration.py:14\n  /app/tests/integration/test_webhook_integration.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_webhook_integration.py:72\n  /app/tests/integration/test_webhook_integration.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_webhook_integration.py:172\n  /app/tests/integration/test_webhook_integration.py:172: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_webhook_integration.py:192\n  /app/tests/integration/test_webhook_integration.py:192: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 29 passed, 8 warnings in 5.92s ========================\n"
+    },
+    "api__api_v1_news_categories_": {
+      "status": "passed",
+      "response_code": 200
+    },
+    "api__api_v1_news_tags_": {
+      "status": "passed",
+      "response_code": 200
+    },
+    "api__api_v1_news_articles_": {
+      "status": "passed",
+      "response_code": 200
+    },
+    "api__api_docs_": {
+      "status": "passed",
+      "response_code": 200
+    },
+    "api__metrics": {
+      "status": "passed",
+      "response_code": 200
+    },
+    "api__celery_metrics_": {
+      "status": "passed",
+      "response_code": 200
+    },
+    "api__business_metrics_": {
+      "status": "passed",
+      "response_code": 200
+    },
+    "api__security_metrics_": {
+      "status": "passed",
+      "response_code": 200
+    }
+  },
+  "demos": {
+    "news_creation": {
+      "status": "passed"
+    },
+    "classification": {
+      "status": "passed"
+    },
+    "webhook_processing": {
+      "status": "passed"
+    },
+    "monitoring_metrics": {
+      "status": "passed"
+    }
+  },
+  "performance": {
+    "/api/v1/news/articles/": {
+      "avg_response_time": 0.028335261344909667,
+      "max_response_time": 0.03272080421447754,
+      "min_response_time": 0.025890827178955078,
+      "requests_count": 10
+    },
+    "/api/v1/news/categories/": {
+      "avg_response_time": 0.026625680923461913,
+      "max_response_time": 0.030461549758911133,
+      "min_response_time": 0.02431964874267578,
+      "requests_count": 10
+    },
+    "/health/": {
+      "avg_response_time": 0.00434422492980957,
+      "max_response_time": 0.006177663803100586,
+      "min_response_time": 0.003587961196899414,
+      "requests_count": 10
+    }
+  },
+  "health_checks": {
+    "API Server": {
+      "status": "healthy",
+      "response_time": 0.005344
+    },
+    "Grafana": {
+      "status": "healthy",
+      "response_time": 0.003404
+    },
+    "Celery Monitoring": {
+      "status": "healthy",
+      "response_time": 1.045918
+    },
+    "Business Metrics": {
+      "status": "healthy",
+      "response_time": 0.013884
+    },
+    "Security Monitoring": {
+      "status": "healthy",
+      "response_time": 0.024329
+    }
+  },
+  "monitoring": {
+    "grafana": {
+      "status": "available",
+      "dashboard_count": 5,
+      "dashboards": [
+        {
+          "id": 5,
+          "uid": "celery-dashboard",
+          "orgId": 1,
+          "title": "Celery Task Monitoring",
+          "uri": "db/celery-task-monitoring",
+          "url": "/d/celery-dashboard/celery-task-monitoring",
+          "slug": "",
+          "type": "dash-db",
+          "tags": [
+            "celery",
+            "monitoring",
+            "tasks"
+          ],
+          "isStarred": false,
+          "sortMeta": 0,
+          "isDeleted": false
+        },
+        {
+          "id": 4,
+          "uid": "business-dashboard",
+          "orgId": 1,
+          "title": "JOTA News - Business Metrics",
+          "uri": "db/jota-news-business-metrics",
+          "url": "/d/business-dashboard/jota-news-business-metrics",
+          "slug": "",
+          "type": "dash-db",
+          "tags": [
+            "business",
+            "jota",
+            "metrics",
+            "news"
+          ],
+          "isStarred": false,
+          "sortMeta": 0,
+          "isDeleted": false
+        },
+        {
+          "id": 3,
+          "uid": "security-dashboard",
+          "orgId": 1,
+          "title": "JOTA News - Security Monitoring",
+          "uri": "db/jota-news-security-monitoring",
+          "url": "/d/security-dashboard/jota-news-security-monitoring",
+          "slug": "",
+          "type": "dash-db",
+          "tags": [
+            "auth",
+            "jota",
+            "monitoring",
+            "security"
+          ],
+          "isStarred": false,
+          "sortMeta": 0,
+          "isDeleted": false
+        },
+        {
+          "id": 1,
+          "uid": "jota-news-complete",
+          "orgId": 1,
+          "title": "JOTA News System - Complete Dashboard",
+          "uri": "db/jota-news-system-complete-dashboard",
+          "url": "/d/jota-news-complete/jota-news-system-complete-dashboard",
+          "slug": "",
+          "type": "dash-db",
+          "tags": [
+            "jota",
+            "monitoring",
+            "news"
+          ],
+          "isStarred": false,
+          "sortMeta": 0,
+          "isDeleted": false
+        },
+        {
+          "id": 2,
+          "uid": "redis-dashboard",
+          "orgId": 1,
+          "title": "Redis Dashboard",
+          "uri": "db/redis-dashboard",
+          "url": "/d/redis-dashboard/redis-dashboard",
+          "slug": "",
+          "type": "dash-db",
+          "tags": [
+            "cache",
+            "jota",
+            "redis"
+          ],
+          "isStarred": false,
+          "sortMeta": 0,
+          "isDeleted": false
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_tests": 10,
+    "passed_tests": 10,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "execution_time": "2025-07-12T22:15:25.124738"
+  }
+}

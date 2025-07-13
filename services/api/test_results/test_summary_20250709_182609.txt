@@ -1,0 +1,14 @@
+JOTA News System Test Summary
+=============================
+Date: Wed Jul  9 18:26:10 -03 2025
+Total Tests: 8
+Passed: 8
+Failed: 0
+Success Rate: 100.00%
+
+Results saved to: test_results/test_results_20250709_182609.txt
+Coverage saved to: test_results/coverage_20250709_182609
+
+For detailed results, check:
+- test_results/test_results_20250709_182609.txt - Full test output
+- test_results/coverage_20250709_182609/index.html - Coverage report
