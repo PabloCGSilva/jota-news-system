@@ -73,17 +73,34 @@ def celery_health(request):
     """Health check endpoint for Celery workers."""
     try:
         from celery import current_app
+        from django.utils import timezone
         
-        # Check if we can connect to Celery
-        inspect = current_app.control.inspect()
-        stats = inspect.stats() if inspect else None
+        # Check if we can connect to Celery with timeout
+        inspect = current_app.control.inspect(timeout=2.0)  # 2 second timeout
         
-        if stats:
+        # Try multiple methods to detect workers
+        stats = None
+        ping_result = None
+        
+        try:
+            stats = inspect.stats()
+        except Exception as e:
+            logger.warning(f"Failed to get stats: {e}")
+        
+        try:
+            ping_result = inspect.ping()
+        except Exception as e:
+            logger.warning(f"Failed to ping workers: {e}")
+        
+        # Consider workers available if either method succeeds
+        if stats or ping_result:
+            worker_count = len(stats) if stats else len(ping_result) if ping_result else 0
             return HttpResponse(
                 json.dumps({
                     'status': 'healthy',
-                    'workers': len(stats),
-                    'timestamp': str(timezone.now()) if 'timezone' in globals() else 'unknown'
+                    'workers': worker_count,
+                    'timestamp': str(timezone.now()),
+                    'detection_method': 'stats' if stats else 'ping'
                 }),
                 content_type='application/json'
             )
@@ -91,7 +108,8 @@ def celery_health(request):
             return HttpResponse(
                 json.dumps({
                     'status': 'unhealthy',
-                    'error': 'No workers available'
+                    'error': 'No workers available or workers not responding',
+                    'timestamp': str(timezone.now())
                 }),
                 content_type='application/json',
                 status=503
@@ -101,7 +119,8 @@ def celery_health(request):
         return HttpResponse(
             json.dumps({
                 'status': 'error',
-                'error': str(e)
+                'error': str(e),
+                'timestamp': str(timezone.now()) if 'timezone' in globals() else 'unknown'
             }),
             content_type='application/json',
             status=500
