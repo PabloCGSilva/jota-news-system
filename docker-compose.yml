@@ -61,7 +61,7 @@ services:
     restart: unless-stopped
 
 
-  # Celery Worker for Background Tasks
+  # Celery Worker for Background Tasks  
   worker:
     build: 
       context: ./services/api
@@ -70,8 +70,9 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/jota_news
       - REDIS_URL=redis://redis:6379/0
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      # CELERY_BROKER_URL and CELERY_RESULT_BACKEND now loaded from .env for scalability
+    env_file:
+      - .env
     depends_on:
       - db
       - redis
@@ -91,8 +92,9 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/jota_news
       - REDIS_URL=redis://redis:6379/0
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      # CELERY_BROKER_URL and CELERY_RESULT_BACKEND now loaded from .env for scalability
+    env_file:
+      - .env
     depends_on:
       - db
       - redis

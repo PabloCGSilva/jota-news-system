@@ -42,6 +42,27 @@ app.conf.beat_schedule = {
 
 app.conf.timezone = 'America/Sao_Paulo'
 
+# Queue definitions for scalability
+app.conf.task_default_queue = 'default'
+app.conf.task_queues = {
+    'default': {
+        'exchange': 'default',
+        'routing_key': 'default',
+    },
+    'classification': {
+        'exchange': 'classification',
+        'routing_key': 'classification',
+    },
+    'webhooks': {
+        'exchange': 'webhooks', 
+        'routing_key': 'webhooks',
+    },
+    'notifications': {
+        'exchange': 'notifications',
+        'routing_key': 'notifications',
+    },
+}
+
 @app.task(bind=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')

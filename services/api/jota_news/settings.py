@@ -192,13 +192,40 @@ CACHES = {
     }
 }
 
-# Celery Configuration
-CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+# Celery Configuration - Scalable Message Broker Architecture
+# For scalability: RabbitMQ for production, Redis for development/caching
+CELERY_BROKER_URL = config(
+    'CELERY_BROKER_URL', 
+    default='pyamqp://guest:guest@rabbitmq:5672//'  # RabbitMQ for enterprise scalability
+)
+CELERY_RESULT_BACKEND = config(
+    'CELERY_RESULT_BACKEND', 
+    default='redis://redis:6379/0'  # Redis optimized for result storage
+)
+
+# Advanced Celery Configuration for Production Scale
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+
+# Enterprise Scalability Settings
+CELERY_TASK_ALWAYS_EAGER = False
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+
+# RabbitMQ specific optimizations
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BROKER_CONNECTION_RETRY = True
+CELERY_BROKER_CONNECTION_MAX_RETRIES = 10
+
+# Task routing for scalability (different queues for different task types)
+CELERY_TASK_ROUTES = {
+    'apps.classification.tasks.*': {'queue': 'classification'},
+    'apps.webhooks.tasks.*': {'queue': 'webhooks'}, 
+    'apps.notifications.tasks.*': {'queue': 'notifications'},
+}
 
 
 # WhatsApp configuration removed - external META Business API dependency not needed

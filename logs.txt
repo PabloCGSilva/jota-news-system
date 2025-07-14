@@ -1,0 +1,37 @@
+Targets
+django (0/1 up)
+Endpoint	State	Labels	Last Scrape	Scrape Duration	Error
+http://api:8000/metrics/metrics	DOWN	
+instance="api:8000"job="django"
+-10.217s ago	
+16.186ms
+	server returned HTTP status 404 Not Found
+nginx (1/1 up)
+Endpoint	State	Labels	Last Scrape	Scrape Duration	Error
+http://nginx-exporter:9113/metrics	UP	
+instance="nginx-exporter:9113"job="nginx"
+-516.000ms ago	
+3.989ms
+	
+postgres (1/1 up)
+Endpoint	State	Labels	Last Scrape	Scrape Duration	Error
+http://postgres-exporter:9187/metrics	UP	
+instance="postgres-exporter:9187"job="postgres"
+1.681s ago	
+40.834ms
+	
+prometheus (1/1 up)
+Endpoint	State	Labels	Last Scrape	Scrape Duration	Error
+http://localhost:9090/metrics	UP	
+instance="localhost:9090"job="prometheus"
+1.794s ago	
+4.728ms
+	
+rabbitmq (1/1 up)
+redis (1/1 up)
+Endpoint	State	Labels	Last Scrape	Scrape Duration	Error
+http://redis-exporter:9121/metrics	UP	
+instance="redis-exporter:9121"job="redis"
+-6.664s ago	
+18.323ms
+	
