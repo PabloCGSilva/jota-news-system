@@ -1,37 +1,46 @@
-Targets
-django (0/1 up)
-Endpoint	State	Labels	Last Scrape	Scrape Duration	Error
-http://api:8000/metrics/metrics	DOWN	
-instance="api:8000"job="django"
--10.217s ago	
-16.186ms
-	server returned HTTP status 404 Not Found
-nginx (1/1 up)
-Endpoint	State	Labels	Last Scrape	Scrape Duration	Error
-http://nginx-exporter:9113/metrics	UP	
-instance="nginx-exporter:9113"job="nginx"
--516.000ms ago	
-3.989ms
-	
-postgres (1/1 up)
-Endpoint	State	Labels	Last Scrape	Scrape Duration	Error
-http://postgres-exporter:9187/metrics	UP	
-instance="postgres-exporter:9187"job="postgres"
-1.681s ago	
-40.834ms
-	
-prometheus (1/1 up)
-Endpoint	State	Labels	Last Scrape	Scrape Duration	Error
-http://localhost:9090/metrics	UP	
-instance="localhost:9090"job="prometheus"
-1.794s ago	
-4.728ms
-	
-rabbitmq (1/1 up)
-redis (1/1 up)
-Endpoint	State	Labels	Last Scrape	Scrape Duration	Error
-http://redis-exporter:9121/metrics	UP	
-instance="redis-exporter:9121"job="redis"
--6.664s ago	
-18.323ms
-	
+pablo@DESKTOP-B08UFFF:/mnt/c/Users/pablo/JOTA/jota-news-system$ python3 quick_metrics_generator.py
+
+🚀 JOTA News System - Quick Metrics Generator
+==================================================
+Target: Fill empty Grafana dashboards quickly
+==================================================
+
+[18:53:31] 🔗 Generating 20 webhook events...
+[18:53:31]   ✓ Webhook 1/20 sent
+[18:53:31]   ✓ Webhook 6/20 sent
+[18:53:31]   ✓ Webhook 11/20 sent
+[18:53:31]   ✓ Webhook 16/20 sent
+[18:53:31] ✅ Generated 20/20 webhook events
+[18:53:33] 🤖 Generating 15 classification tasks...
+[18:53:37]   ✓ Classification task 1/15 queued
+[18:53:55]   ✓ Classification task 6/15 queued
+[18:54:11]   ✓ Classification task 11/15 queued
+[18:54:25] ✅ Generated 15/15 classification tasks
+[18:54:27] 🔐 Generating 30 authentication attempts...
+[18:54:27]   ✓ Auth attempt 1/30
+[18:54:27]   ✓ Auth attempt 11/30
+[18:54:28]   ✓ Auth attempt 21/30
+[18:54:28] ✅ Generated 30/30 authentication attempts
+[18:54:30] 📡 Generating 40 API calls...
+[18:54:30]   ✓ API call 1/40 - /api/v1/news/articles/
+[18:54:33]   ✗ API call 4 failed: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=3)
+[18:54:36]   ✗ API call 7 failed: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=3)
+[18:54:39]   ✗ API call 11 failed: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=3)
+[18:54:39]   ✓ API call 16/40 - /business/health/
+[18:54:42]   ✗ API call 29 failed: HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=3)
+[18:54:42]   ✓ API call 31/40 - /api/v1/news/categories/
+[18:54:42] ✅ Generated 36/40 API calls
+[18:54:42] ⏳ Waiting for tasks to be processed...
+[18:54:58] 📊 Checking metrics availability...
+[18:54:58] ⚠ Celery metrics still empty
+[18:54:58] ✅ News metrics are available!
+[18:54:58] ✅ Webhook metrics are available!
+
+==================================================
+✅ QUICK METRICS GENERATION COMPLETED
+==================================================
+Duration: 87.5 seconds
+📊 Check your Grafana dashboards now!
+🌐 Grafana: http://localhost:3000
+📈 Metrics: http://localhost:8000/metrics
+==================================================

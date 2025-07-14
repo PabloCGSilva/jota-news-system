@@ -190,30 +190,35 @@ def manually_update_security_metrics(auth_events, failed_attempts, violations):
     """Manually update security metrics to ensure they're populated"""
     print_status("🔄 Manually updating security metrics...")
     
+    success_count = len([e for e in auth_events if e.get('success', False)])
+    failure_count = len([e for e in auth_events if not e.get('success', False)])
+    admin_failures = len([f for f in failed_attempts if f.get('username') == 'admin'])
+    
     try:
         cmd = f'''docker-compose exec -T api python manage.py shell -c "
 from jota_news.security_monitoring import (
-    SECURITY_EVENTS_TOTAL, AUTHENTICATION_ATTEMPTS_TOTAL,
-    FAILED_LOGIN_ATTEMPTS_TOTAL, RATE_LIMIT_VIOLATIONS_TOTAL
+    SECURITY_EVENTS_TOTAL, AUTHENTICATION_ATTEMPTS,
+    FAILED_LOGIN_ATTEMPTS, RATE_LIMIT_VIOLATIONS
 )
+import random
 
 # Update authentication metrics
-AUTHENTICATION_ATTEMPTS_TOTAL.labels(status='success').inc({len([e for e in {auth_events} if e.get('success', False)])})
-AUTHENTICATION_ATTEMPTS_TOTAL.labels(status='failure').inc({len([e for e in {auth_events} if not e.get('success', False)])})
+AUTHENTICATION_ATTEMPTS.labels(method='password', result='success', user_type='admin').inc({success_count})
+AUTHENTICATION_ATTEMPTS.labels(method='password', result='failed', user_type='admin').inc({failure_count})
 
 # Update failed login attempts
-FAILED_LOGIN_ATTEMPTS_TOTAL.labels(username='admin').inc({len([f for f in {failed_attempts} if f.get('username') == 'admin'])})
-FAILED_LOGIN_ATTEMPTS_TOTAL.labels(username='root').inc({len([f for f in {failed_attempts} if f.get('username') == 'root'])})
-FAILED_LOGIN_ATTEMPTS_TOTAL.labels(username='user').inc({len([f for f in {failed_attempts} if f.get('username') == 'user'])})
-FAILED_LOGIN_ATTEMPTS_TOTAL.labels(username='other').inc({len([f for f in {failed_attempts} if f.get('username') not in ['admin', 'root', 'user']])})
+FAILED_LOGIN_ATTEMPTS.labels(ip_address='127.0.0.1', username='admin', method='password').inc({admin_failures})
+FAILED_LOGIN_ATTEMPTS.labels(ip_address='192.168.1.100', username='root', method='password').inc({len([f for f in {failed_attempts} if f.get('username') == 'root'])})
+FAILED_LOGIN_ATTEMPTS.labels(ip_address='10.0.0.50', username='user', method='password').inc({len([f for f in {failed_attempts} if f.get('username') == 'user'])})
 
-# Update rate limit violations
-RATE_LIMIT_VIOLATIONS_TOTAL.labels(endpoint='/api/v1/news/articles/').inc({len(violations)})
+# Update rate limit violations  
+RATE_LIMIT_VIOLATIONS.labels(resource='/api/v1/news/articles/', ip_address='10.0.0.100', user_type='anonymous').inc({len(violations)})
 
 # Update general security events
-SECURITY_EVENTS_TOTAL.labels(event_type='authentication_failure').inc({len(failed_attempts)})
-SECURITY_EVENTS_TOTAL.labels(event_type='rate_limit_violation').inc({len(violations)})
-SECURITY_EVENTS_TOTAL.labels(event_type='suspicious_activity').inc({random.randint(5, 15)})
+SECURITY_EVENTS_TOTAL.labels(event_type='authentication_failure', severity='medium', source='login').inc({failure_count})
+SECURITY_EVENTS_TOTAL.labels(event_type='rate_limit_violation', severity='low', source='api').inc({len(violations)})
+SECURITY_EVENTS_TOTAL.labels(event_type='suspicious_activity', severity='high', source='monitor').inc(random.randint(5, 15))
+SECURITY_EVENTS_TOTAL.labels(event_type='brute_force_detected', severity='high', source='authentication').inc(random.randint(2, 8))
 
 print('✓ Security metrics updated manually')
 "'''
