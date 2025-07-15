@@ -35,6 +35,9 @@ def classify_news(self, news_id, method='hybrid'):
         # Classify using the classifier engine
         result = classifier.classify_news(news.title, news.content, method)
         
+        # Generate automatic tags using pure Python logic
+        generated_tags = classifier.generate_automatic_tags(news.title, news.content)
+        
         # Get category and subcategory objects
         category = None
         subcategory = None
@@ -100,13 +103,47 @@ def classify_news(self, news_id, method='hybrid'):
                 
                 news.save()
         
+        # Process automatic tags (create or get existing)
+        tag_results = []
+        if generated_tags:
+            from apps.news.models import Tag
+            
+            for tag_data in generated_tags:
+                tag_name = tag_data['name']
+                tag_confidence = tag_data['confidence']
+                
+                # Create or get existing tag
+                tag, created = Tag.objects.get_or_create(
+                    name=tag_name,
+                    defaults={
+                        'slug': tag_name.lower().replace(' ', '-'),
+                        'description': f"Auto-generated tag (confidence: {tag_confidence:.2f})"
+                    }
+                )
+                
+                # Add tag to news if confidence is high enough
+                if tag_confidence >= 0.3:  # Minimum confidence threshold
+                    news.tags.add(tag)
+                    tag_results.append({
+                        'name': tag_name,
+                        'confidence': tag_confidence,
+                        'created': created,
+                        'source': tag_data.get('source', 'unknown')
+                    })
+                    
+                    # Update tag usage count
+                    tag.usage_count = tag.usage_count + 1
+                    tag.save()
+        
         # Create processing log
         from apps.news.models import NewsProcessingLog
+        # Create processing log with tag information
+        tag_summary = f"Generated {len(tag_results)} automatic tags" if tag_results else "No tags generated"
         NewsProcessingLog.objects.create(
             news=news,
             stage='classification',
             status='success',
-            message=f"Classified as {category.name if category else 'Unknown'} with {result['category_confidence']:.2f} confidence",
+            message=f"Classified as {category.name if category else 'Unknown'} with {result['category_confidence']:.2f} confidence. {tag_summary}",
             processing_time=result['processing_time']
         )
         
@@ -118,7 +155,9 @@ def classify_news(self, news_id, method='hybrid'):
             'category': category.name if category else None,
             'subcategory': subcategory.name if subcategory else None,
             'confidence': result['category_confidence'],
-            'processing_time': result['processing_time']
+            'processing_time': result['processing_time'],
+            'generated_tags': tag_results,
+            'tags_count': len(tag_results)
         }
         
     except Exception as exc:
