@@ -54,7 +54,7 @@ jobs:
       continue-on-error: true
       
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: |
@@ -137,7 +137,7 @@ jobs:
         coverage html
         
     - name: Upload test coverage
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report
         path: services/api/htmlcov/
@@ -182,7 +182,7 @@ jobs:
         outputs: type=docker,dest=/tmp/api-image.tar
         
     - name: Upload API image artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: api-image
         path: /tmp/api-image.tar
@@ -202,7 +202,7 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Download API image
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: api-image
         path: /tmp
@@ -257,7 +257,7 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Download API image
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: api-image
         path: /tmp
